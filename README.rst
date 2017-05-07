@@ -1,0 +1,2 @@
+sbt-aws-cloudformation
+======================
