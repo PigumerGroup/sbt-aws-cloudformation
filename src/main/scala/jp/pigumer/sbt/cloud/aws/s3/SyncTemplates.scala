@@ -3,29 +3,42 @@ package jp.pigumer.sbt.cloud.aws.s3
 import cloudformation.AwsSettings
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.PutObjectRequest
+import sbt.Keys._
 import sbt._
-import sbt.complete.DefaultParsers.spaceDelimited
+import sbt.complete.DefaultParsers._
+
+import scala.util.{Failure, Success, Try}
 
 trait SyncTemplates {
 
   protected def amazonS3Client(settings: AwsSettings): AmazonS3Client
 
-  private def put(client: AmazonS3Client, bucketName: String, stage: String, file: File): File = {
-    val key = s"${stage}/${file.name}"
-    val request = new PutObjectRequest(bucketName, key, file)
-    client.putObject(request)
+  private def put(client: AmazonS3Client, log: Logger, bucketName: String, key: String, file: java.io.File) {
+    if (file.isFile) {
+      val k = s"${key}/${file.getName}"
+      log.info(s"upload ${k} to ${bucketName}")
+      val request = new PutObjectRequest(bucketName, s"${key}/${file.getName}", file)
+      client.putObject(request)
+      return
+    }
+    file.listFiles.foreach(f => put(client, log, bucketName, s"${key}/${file.getName}", f))
   }
 
-  def syncTemplatesTask(awsSettings: TaskKey[AwsSettings]) = Def.inputTask {
-    val stage = (spaceDelimited("<stage>").parsed match {
-      case Seq(a) => Some(a)
-      case _ => None
-    }).getOrElse(sys.error("Error deploy. useage: deploy <stage>"))
+  private def uploads(awsSettings: AwsSettings, stage: String, log: Logger) = Try {
+    val client = amazonS3Client(awsSettings)
+    put(client, log, awsSettings.bucketName, stage, awsSettings.templates)
+  }
 
-    val settings = awsSettings.value
-    val client = amazonS3Client(settings)
-
-    settings.templates.listFiles.filter(f => f.isFile).
-      foreach(f => put(client, settings.bucketName, stage, f))
+  def syncTemplatesTask(awsSettings: SettingKey[AwsSettings]) = Def.inputTask {
+    val log = streams.value.log
+    spaceDelimited("<stage>").parsed match {
+      case Seq(stage) => uploads(awsSettings.value, stage, log) match {
+        case Success(_) => ()
+        case Failure(t) => {
+          sys.error(t.toString)
+        }
+      }
+      case _ => sys.error("error")
+    }
   }
 }

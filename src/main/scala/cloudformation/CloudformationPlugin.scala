@@ -4,11 +4,14 @@ import sbt.{Def, _}
 
 object CloudformationPlugin extends AutoPlugin {
 
-  import CloudformationKeys._
-  import CloudformationTasks._
+  object autoImport extends CloudformationKeys {
+  }
+
+  import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-    syncTemplates := syncTemplatesTask(awsSettings),
+    syncTemplates := CloudformationTasks.syncTemplatesTask(awsSettings).evaluated,
+
     awsSettings := awsSettings.value
   )
 }
