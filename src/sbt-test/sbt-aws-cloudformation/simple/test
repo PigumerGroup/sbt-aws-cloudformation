@@ -1,1 +1,7 @@
 > syncTemplates test
+
+> createStack test test test1.yaml
+
+> updateStack test test
+
+> deleteStack test test

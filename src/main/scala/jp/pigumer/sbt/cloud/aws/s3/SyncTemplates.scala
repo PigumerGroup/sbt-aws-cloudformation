@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try}
 
 trait SyncTemplates {
 
-  protected def amazonS3Client(settings: AwsSettings): AmazonS3Client
+  def amazonS3Client(settings: AwsSettings): AmazonS3Client
 
   private def put(client: AmazonS3Client, log: Logger, bucketName: String, key: String, file: java.io.File) {
     if (file.isFile) {
