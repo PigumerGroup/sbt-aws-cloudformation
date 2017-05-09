@@ -20,3 +20,6 @@ sbt-aws-cloudformation
 ::
 
   syncTemplates <stage>
+  createStack <stage> <stackName> <template>
+  deleteStack <stage> <stackName>
+
