@@ -35,9 +35,10 @@ trait CloudFormationProvider {
           stacks.map(_.getStackStatus).
             forall(s => {
               s == StackStatus.CREATE_COMPLETE.toString ||
-                s == StackStatus.CREATE_FAILED.toString ||
-                s == StackStatus.ROLLBACK_FAILED.toString ||
-                s == StackStatus.DELETE_FAILED.toString
+              s == StackStatus.CREATE_FAILED.toString ||
+              s == StackStatus.ROLLBACK_FAILED.toString ||
+              s == StackStatus.DELETE_FAILED.toString ||
+              s == StackStatus.ROLLBACK_COMPLETE.toString
             })
         }
       }

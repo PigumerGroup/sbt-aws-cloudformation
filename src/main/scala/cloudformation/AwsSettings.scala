@@ -2,10 +2,9 @@ package cloudformation
 
 import java.io.File
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsProviderChain}
 
 case class AwsSettings(region: String = "us-east-1",
                        bucketName: String,
-                       templates: File) {
-  lazy val credentialsProvider = new DefaultAWSCredentialsProviderChain()
-}
+                       templates: File,
+                       credentialsProvider: AWSCredentialsProviderChain = new DefaultAWSCredentialsProviderChain())

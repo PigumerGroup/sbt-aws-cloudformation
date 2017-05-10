@@ -14,12 +14,15 @@ sbt-aws-cloudformation
         region = <YOUR_REGION_NAME>,
         bucketName = <YOUR_BUCKET_NAME>,
         templates = file(<YOUR_TEMPLATES>)
-      )
+      ),
+      stack = Map(<SHORT_STACK_NAME> -> CloudFormationStack(
+        stackName = <STACK_NAME>,
+        template = <YOUR_TEMPLATE>))
     )
 
 ::
 
   syncTemplates <stage>
-  createStack <stage> <stackName> <template>
-  deleteStack <stage> <stackName>
+  createStack <stage> <shortName>
+  deleteStack <stage> <shortName>
 

@@ -4,6 +4,7 @@ import sbt._
 
 trait CloudformationKeys {
   val awsSettings = settingKey[AwsSettings]("")
+  val stacks = settingKey[Map[String, CloudFormationStack]]("")
 
   val syncTemplates = inputKey[Unit]("upload cloudformation templates")
 

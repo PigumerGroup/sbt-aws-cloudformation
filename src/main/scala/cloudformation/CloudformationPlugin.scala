@@ -11,6 +11,7 @@ object CloudformationPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     awsSettings := awsSettings.value,
+    stacks := stacks.value,
 
     syncTemplates := CloudformationTasks.syncTemplatesTask(awsSettings).evaluated,
 

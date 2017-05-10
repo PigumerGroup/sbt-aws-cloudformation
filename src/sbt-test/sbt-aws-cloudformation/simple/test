@@ -1,7 +1,15 @@
 > syncTemplates test
 
-> createStack test test test1.yaml
+-> createStack test fail
+
+> createStack test test
 
 > updateStack test test
 
 > deleteStack test test
+
+-> createStack test fail2
+
+> createStack test test2
+
+> deleteStack test test2
