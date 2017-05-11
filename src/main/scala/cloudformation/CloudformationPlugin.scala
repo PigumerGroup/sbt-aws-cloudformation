@@ -10,13 +10,13 @@ object CloudformationPlugin extends AutoPlugin {
   import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-    awsSettings := awsSettings.value,
-    stacks := stacks.value,
+    awscfSettings := awscfSettings.value,
+    awscfStacks := awscfStacks.value,
 
-    syncTemplates := CloudformationTasks.syncTemplatesTask(awsSettings).evaluated,
+    awscfSyncTemplates := CloudformationTasks.syncTemplatesTask(awscfSettings).evaluated,
 
-    createStack := CloudformationTasks.createStackTask(awsSettings).evaluated,
-    deleteStack := CloudformationTasks.deleteStackTask(awsSettings).evaluated,
-    updateStack := CloudformationTasks.updateStackTask(awsSettings).evaluated
+    awscfCreateStack := CloudformationTasks.createStackTask(awscfSettings).evaluated,
+    awscfDeleteStack := CloudformationTasks.deleteStackTask(awscfSettings).evaluated,
+    awscfUpdateStack := CloudformationTasks.updateStackTask(awscfSettings).evaluated
   )
 }

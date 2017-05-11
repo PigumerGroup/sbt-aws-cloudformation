@@ -1,15 +1,17 @@
-> syncTemplates test
+> awscfSyncTemplates test
 
--> createStack test fail
+-> awscfCreateStack test fail
 
-> createStack test test
+> awscfCreateStack test test
 
-> updateStack test test
+> awscfUpdateStack test testu
 
-> deleteStack test test
+> awscfDeleteStack test test
 
--> createStack test fail2
+-> awscfCreateStack test fail2
 
-> createStack test test2
+> awscfCreateStack test test2
 
-> deleteStack test test2
+> awscfUpdateStack test test2u
+
+> awscfDeleteStack test test2

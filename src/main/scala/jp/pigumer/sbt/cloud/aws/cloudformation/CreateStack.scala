@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.{AwsSettings, CloudFormationStack}
+import cloudformation.{AwscfSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter}
 import sbt.Def._
@@ -14,19 +14,19 @@ trait CreateStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  def amazonCloudFormation(settings: AwsSettings): AmazonCloudFormationClient
+  def amazonCloudFormation(settings: AwscfSettings): AmazonCloudFormationClient
 
-  def url(awsSettings: AwsSettings, stage: String, template: String): String
+  def url(awsSettings: AwscfSettings, stage: String, template: String): String
 
   def waitForCompletion(client: AmazonCloudFormationClient, stackName: String, log: Logger): Unit
 
-  private def create(awsSettings: AwsSettings,
+  private def create(awscfSettings: AwscfSettings,
                      stage: String,
-                     stack: CloudFormationStack,
+                     stack: CloudformationStack,
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
 
-    val u = url(awsSettings, stage, stack.template)
+    val u = url(awscfSettings, stage, stack.template)
     val params: Seq[Parameter] = stack.parameters.map {
       case (key, value) => {
         val p: Parameter = new Parameter().withParameterKey(key).withParameterValue(value)
@@ -39,18 +39,18 @@ trait CreateStack {
       withStackName(stack.stackName).
       withCapabilities(stack.capabilities.asJava).
       withParameters(params.asJava)
-    val client = amazonCloudFormation(awsSettings)
+    val client = amazonCloudFormation(awscfSettings)
     client.createStack(request)
     waitForCompletion(client, stack.stackName, log)
   }
 
-  def createStackTask(awsSettings: SettingKey[AwsSettings]) = Def.inputTask {
+  def createStackTask(awscfSettings: SettingKey[AwscfSettings]) = Def.inputTask {
     val log = streams.value.log
     spaceDelimited("<stage>, <shortName>").parsed match {
       case Seq(stage, shortName) => {
         (for {
-          stack <- Try(stacks.value.get(shortName).getOrElse(throw new RuntimeException()))
-          _ <- create(awsSettings.value, stage, stack, log)
+          stack <- Try(awscfStacks.value.get(shortName).getOrElse(throw new RuntimeException()))
+          _ <- create(awscfSettings.value, stage, stack, log)
         } yield ()) match {
           case Success(_) => ()
           case Failure(t) => {

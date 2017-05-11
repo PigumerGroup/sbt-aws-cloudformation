@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.{AwsSettings, CloudFormationStack}
+import cloudformation.{AwscfSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.DeleteStackRequest
 import sbt.Def.spaceDelimited
@@ -13,11 +13,11 @@ trait DeleteStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  def amazonCloudFormation(settings: AwsSettings): AmazonCloudFormationClient
+  def amazonCloudFormation(settings: AwscfSettings): AmazonCloudFormationClient
 
   def waitForCompletion(client: AmazonCloudFormationClient, stackName: String, log: Logger): Unit
 
-  private def delete(awsSettings: AwsSettings, stage: String, stack: CloudFormationStack, log: Logger) = Try {
+  private def delete(awsSettings: AwscfSettings, stage: String, stack: CloudformationStack, log: Logger) = Try {
     val request = new DeleteStackRequest().
       withStackName(stack.stackName)
     val client = amazonCloudFormation(awsSettings)
@@ -25,13 +25,13 @@ trait DeleteStack {
     waitForCompletion(client, stack.stackName, log)
   }
 
-  def deleteStackTask(awsSettings: SettingKey[AwsSettings]) = Def.inputTask {
+  def deleteStackTask(awscfSettings: SettingKey[AwscfSettings]) = Def.inputTask {
     val log = streams.value.log
     spaceDelimited("<stage>, <shortName>").parsed match {
       case Seq(stage, shortName) => {
         (for {
-          stack <- Try(stacks.value.get(shortName).getOrElse(throw new RuntimeException()))
-          _ <- delete(awsSettings.value, stage, stack, log)
+          stack <- Try(awscfStacks.value.get(shortName).getOrElse(throw new RuntimeException()))
+          _ <- delete(awscfSettings.value, stage, stack, log)
         } yield ()) match {
           case Success(_) => ()
           case Failure(t) => {

@@ -20,6 +20,7 @@ Resources:
             - Effect: Allow
               Action:
               - "logs:*"
+              - "xray:*"
               Resource: "*"
 Outputs:
   LambdaExecutionRole:

@@ -9,7 +9,7 @@ class CloudformationTasksSpec extends Specification {
   "CloudformationTasks" should {
 
     "amazonS3Client" in {
-      val client = CloudformationTasks.amazonS3Client(AwsSettings(bucketName = "", templates = new File(".")))
+      val client = CloudformationTasks.amazonS3Client(AwscfSettings(bucketName = "", templates = new File(".")))
       client != null must beTrue
     }
   }

@@ -3,12 +3,12 @@ package cloudformation
 import sbt._
 
 trait CloudformationKeys {
-  val awsSettings = settingKey[AwsSettings]("")
-  val stacks = settingKey[Map[String, CloudFormationStack]]("")
+  val awscfSettings = settingKey[AwscfSettings]("")
+  val awscfStacks = settingKey[Map[String, CloudformationStack]]("")
 
-  val syncTemplates = inputKey[Unit]("upload cloudformation templates")
+  val awscfSyncTemplates = inputKey[Unit]("upload cloudformation templates")
 
-  val createStack = inputKey[Unit]("")
-  val deleteStack = inputKey[Unit]("")
-  val updateStack = inputKey[Unit]("")
+  val awscfCreateStack = inputKey[Unit]("")
+  val awscfDeleteStack = inputKey[Unit]("")
+  val awscfUpdateStack = inputKey[Unit]("")
 }

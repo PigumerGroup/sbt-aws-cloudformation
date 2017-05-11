@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  CIDR:
+    Type: String
+    Description: VPC CIDR
+Resources:
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref 'CIDR'
+      Tags:
+      - Key: Name
+        Value: myVPC
+Outputs:
+  myVPC:
+    Value: !Ref 'myVPC'
+    Export:
+      Name: myVPC

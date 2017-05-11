@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.AwsSettings
+import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.model.{DescribeStacksRequest, StackStatus}
 import com.amazonaws.services.cloudformation.{AmazonCloudFormationClient, AmazonCloudFormationClientBuilder}
 import sbt.Logger
@@ -10,14 +10,14 @@ import scala.util.{Failure, Success, Try}
 
 trait CloudFormationProvider {
 
-  def amazonCloudFormation(settings: AwsSettings): AmazonCloudFormationClient =
+  def amazonCloudFormation(settings: AwscfSettings): AmazonCloudFormationClient =
     AmazonCloudFormationClientBuilder.
       standard.
       withCredentials(settings.credentialsProvider).
       withRegion(settings.region).
       build.asInstanceOf[AmazonCloudFormationClient]
 
-  def url(awsSettings: AwsSettings, stage: String, template: String): String =
+  def url(awsSettings: AwscfSettings, stage: String, template: String): String =
     s"https://${awsSettings.bucketName}.s3.amazonaws.com/${stage}/${awsSettings.templates.getName}/${template}"
 
   def waitForCompletion(client: AmazonCloudFormationClient, stackName: String, log: Logger) = {
@@ -37,6 +37,7 @@ trait CloudFormationProvider {
               s == StackStatus.CREATE_COMPLETE.toString ||
               s == StackStatus.CREATE_FAILED.toString ||
               s == StackStatus.ROLLBACK_FAILED.toString ||
+              s == StackStatus.UPDATE_COMPLETE.toString ||
               s == StackStatus.DELETE_FAILED.toString ||
               s == StackStatus.ROLLBACK_COMPLETE.toString
             })

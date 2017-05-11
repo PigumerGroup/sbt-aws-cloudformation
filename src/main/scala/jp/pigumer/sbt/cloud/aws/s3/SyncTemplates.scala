@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.s3
 
-import cloudformation.AwsSettings
+import cloudformation.AwscfSettings
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.PutObjectRequest
 import sbt.Keys._
@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try}
 
 trait SyncTemplates {
 
-  def amazonS3Client(settings: AwsSettings): AmazonS3Client
+  def amazonS3Client(settings: AwscfSettings): AmazonS3Client
 
   private def put(client: AmazonS3Client, log: Logger, bucketName: String, key: String, file: java.io.File) {
     if (file.isFile) {
@@ -24,12 +24,12 @@ trait SyncTemplates {
     file.listFiles.foreach(f => put(client, log, bucketName, s"${key}/${file.getName}", f))
   }
 
-  private def uploads(awsSettings: AwsSettings, stage: String, log: Logger) = Try {
+  private def uploads(awsSettings: AwscfSettings, stage: String, log: Logger) = Try {
     val client = amazonS3Client(awsSettings)
     put(client, log, awsSettings.bucketName, stage, awsSettings.templates)
   }
 
-  def syncTemplatesTask(awsSettings: SettingKey[AwsSettings]) = Def.inputTask {
+  def syncTemplatesTask(awsSettings: SettingKey[AwscfSettings]) = Def.inputTask {
     val log = streams.value.log
     spaceDelimited("<stage>").parsed match {
       case Seq(stage) => uploads(awsSettings.value, stage, log) match {
