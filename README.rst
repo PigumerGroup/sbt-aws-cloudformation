@@ -3,6 +3,10 @@ sbt-aws-cloudformation
 
 ::
 
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "1.0.0")
+
+::
+
   import cloudformation._
 
   lazy val root = (project in file(".")).
@@ -17,7 +21,9 @@ sbt-aws-cloudformation
       ),
       awscfStacks := Map(<SHORT_STACK_NAME> -> CloudformationStack(
         stackName = <STACK_NAME>,
-        template = <YOUR_TEMPLATE>))
+        template = <YOUR_TEMPLATE>,
+        parameters = Map(<KEY> -> <VALUE>),
+        capabilities = Seq("CAPABILITY_NAMED_IAM")))
     )
 
 ::
