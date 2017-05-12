@@ -1,8 +1,8 @@
 lazy val root = (project in file(".")).
   settings(
-    organization := "jp.pigumer.sbt.cloud",
+    organization := "com.pigumer.sbt.cloud",
     name := "sbt-aws-cloudformation",
-    version := "0.0.1-SNAPSHOT",
+    version := "1.0.0",
     sbtPlugin := true,
     Dependencies.AwsCloudformationDeps
   )
