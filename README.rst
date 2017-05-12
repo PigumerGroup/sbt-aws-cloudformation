@@ -19,10 +19,10 @@ sbt-aws-cloudformation
         bucketName = <YOUR_BUCKET_NAME>,
         templates = file(<YOUR_TEMPLATES>)
       ),
-      awscfStacks := Map(<SHORT_STACK_NAME> -> CloudformationStack(
+      awscfStacks := Map(<SHORT_STACK_NAME> → CloudformationStack(
         stackName = <STACK_NAME>,
         template = <YOUR_TEMPLATE>,
-        parameters = Map(<KEY> -> <VALUE>),
+        parameters = Map(<KEY> → <VALUE>),
         capabilities = Seq("CAPABILITY_NAMED_IAM")))
     )
 

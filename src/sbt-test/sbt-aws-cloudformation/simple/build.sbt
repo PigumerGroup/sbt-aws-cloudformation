@@ -11,32 +11,32 @@ lazy val root = (project in file(".")).
       templates = file("cloudformation")
     ),
     awscfStacks := Map(
-      "test" -> CloudformationStack(
+      "test" → CloudformationStack(
         stackName = "test",
         template = "test1.yaml",
-        parameters = Map("CIDR" -> "10.0.0.0/16")
+        parameters = Map("CIDR" → "10.0.0.0/16")
       ),
-      "testu" -> CloudformationStack(
+      "testu" → CloudformationStack(
         stackName = "test",
         template = "test1u.yaml",
-        parameters = Map("CIDR" -> "10.0.0.0/16")
+        parameters = Map("CIDR" → "10.0.0.0/16")
       ),
-      "fail" -> CloudformationStack(
+      "fail" → CloudformationStack(
         stackName = "test",
         template = "test1.yaml",
-        parameters = Map("IPAddr" -> "10.0.0.0/16")
+        parameters = Map("IPAddr" → "10.0.0.0/16")
       ),
-      "test2" -> CloudformationStack(
+      "test2" → CloudformationStack(
         stackName = "test2",
         template = "test2.yaml",
         capabilities = Seq("CAPABILITY_NAMED_IAM")
       ),
-      "test2u" -> CloudformationStack(
+      "test2u" → CloudformationStack(
         stackName = "test2",
         template = "test2u.yaml",
         capabilities = Seq("CAPABILITY_NAMED_IAM")
       ),
-      "fail2" -> CloudformationStack(
+      "fail2" → CloudformationStack(
         stackName = "test2",
         template = "test2.yaml"
       )
