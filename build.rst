@@ -16,3 +16,4 @@ fly set-pipeline::
     -c ci/buildPipeline.yaml \
     -v 'AWS_ACCESS_KEY_ID=<YOUR AWS ACCESS KEY ID>'
     -v 'AWS_SECRET_ACCESS_KEY=<YOUR SECRET KEY>'
+  fly -t concourseci unpause-pipeline -p sbt-aws-cloudformation
