@@ -7,12 +7,12 @@ image_resource:
     repository: pigumergroup/ubuntu-sbt
 
 params:
-  ACCESS_KEY_ID:
-  SECRET_ACCESS_KEY:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
 
 inputs:
-  - name: source
+  - name: sbt-aws-cloudformation-src
 
 run:
-  dir: source
+  dir: sbt-aws-cloudformation-src
   path: ci/build.sh

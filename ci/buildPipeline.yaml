@@ -1,0 +1,15 @@
+resources:
+  - name: sbt-aws-cloudformation-src
+    type: git
+    source:
+      uri: https://github.com/PigumerGroup/sbt-aws-cloudformation.git
+
+jobs:
+  - name: sbt-aws-cloudformation
+    plan:
+      - get: sbt-aws-cloudformation-src
+      - task: compile
+        file: sbt-aws-cloudformation-src/ci/build.yaml
+    params:
+      AWS_ACCESS_KEY_ID: {{AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY: {{AWS_SECRET_ACCESS_KEY}}
