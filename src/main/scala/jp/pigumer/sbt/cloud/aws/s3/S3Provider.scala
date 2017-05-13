@@ -5,10 +5,11 @@ import com.amazonaws.services.s3.{AmazonS3Client, AmazonS3ClientBuilder}
 
 trait S3Provider {
 
-  def amazonS3Client(settings: AwscfSettings): AmazonS3Client =
+  lazy val amazonS3Client: AwscfSettings ⇒ AmazonS3Client = settings ⇒ {
     AmazonS3ClientBuilder.
       standard.
       withCredentials(settings.credentialsProvider).
       withRegion(settings.region).
       build.asInstanceOf[AmazonS3Client]
+  }
 }

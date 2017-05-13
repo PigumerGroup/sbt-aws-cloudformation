@@ -10,12 +10,13 @@ import scala.util.{Failure, Success, Try}
 
 trait CloudFormationProvider {
 
-  def amazonCloudFormation(settings: AwscfSettings): AmazonCloudFormationClient =
-    AmazonCloudFormationClientBuilder.
-      standard.
-      withCredentials(settings.credentialsProvider).
-      withRegion(settings.region).
-      build.asInstanceOf[AmazonCloudFormationClient]
+  lazy val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient = settings ⇒ {
+      AmazonCloudFormationClientBuilder.
+        standard.
+        withCredentials(settings.credentialsProvider).
+        withRegion(settings.region).
+        build.asInstanceOf[AmazonCloudFormationClient]
+  }
 
   def url(awsSettings: AwscfSettings, stage: String, template: String): String =
     s"https://${awsSettings.bucketName}.s3.amazonaws.com/${stage}/${awsSettings.templates.getName}/${template}"
@@ -27,13 +28,13 @@ trait CloudFormationProvider {
     var completed = false
     while (!completed) {
       completed = Try(client.describeStacks(request).getStacks.asScala.toSeq) match {
-        case Failure(t) => true
-        case Success(stacks) => if (stacks.isEmpty) {
+        case Failure(t) ⇒ true
+        case Success(stacks) ⇒ if (stacks.isEmpty) {
           log.warn("Stack has been deleted")
           true
         } else {
           stacks.map(_.getStackStatus).
-            forall(s => {
+            forall(s ⇒ {
               s == StackStatus.CREATE_COMPLETE.toString ||
               s == StackStatus.CREATE_FAILED.toString ||
               s == StackStatus.ROLLBACK_FAILED.toString ||

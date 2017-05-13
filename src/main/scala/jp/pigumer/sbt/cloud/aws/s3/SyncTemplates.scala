@@ -13,7 +13,7 @@ trait SyncTemplates {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  def amazonS3Client(settings: AwscfSettings): AmazonS3Client
+  val amazonS3Client: AwscfSettings ⇒ AmazonS3Client
 
   private def put(client: AmazonS3Client, log: Logger, bucketName: String, key: String, file: java.io.File) {
     if (file.isFile) {
@@ -23,7 +23,7 @@ trait SyncTemplates {
       client.putObject(request)
       return
     }
-    file.listFiles.foreach(f => put(client, log, bucketName, s"${key}/${file.getName}", f))
+    file.listFiles.foreach(f ⇒ put(client, log, bucketName, s"${key}/${file.getName}", f))
   }
 
   private def uploads(awsSettings: AwscfSettings, stage: String, log: Logger) = Try {
@@ -35,13 +35,13 @@ trait SyncTemplates {
     val log = streams.value.log
     val settings = awscfSettings.value
     spaceDelimited("<stage>").parsed match {
-      case Seq(stage) => uploads(settings, stage, log) match {
-        case Success(_) => ()
-        case Failure(t) => {
+      case Seq(stage) ⇒ uploads(settings, stage, log) match {
+        case Success(_) ⇒ ()
+        case Failure(t) ⇒ {
           sys.error(t.toString)
         }
       }
-      case _ => sys.error("error")
+      case _ ⇒ sys.error("error")
     }
   }
 }
