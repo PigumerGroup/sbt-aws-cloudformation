@@ -29,7 +29,10 @@ sbt-aws-cloudformation
 ::
 
   awscfSyncTemplates <stage>
+
   awscfCreateStack <stage> <shortName>
   awscfUpdateStack <stage> <shortName>
   awscfDeleteStack <stage> <shortName>
+
+  awscfValidateTemplate <stage> <templateName>
 
