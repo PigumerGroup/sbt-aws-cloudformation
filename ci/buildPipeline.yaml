@@ -10,6 +10,6 @@ jobs:
       - get: sbt-aws-cloudformation-src
       - task: compile
         file: sbt-aws-cloudformation-src/ci/build.yaml
-    params:
-      AWS_ACCESS_KEY_ID: {{AWS_ACCESS_KEY_ID}}
-      AWS_SECRET_ACCESS_KEY: {{AWS_SECRET_ACCESS_KEY}}
+        params:
+          AWS_ACCESS_KEY_ID: {{AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: {{AWS_SECRET_ACCESS_KEY}}
