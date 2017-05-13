@@ -1,16 +1,17 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.CloudformationPlugin.autoImport.awscfStacks
 import cloudformation.{AwscfSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.{Parameter, UpdateStackRequest}
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
-import sbt.{Def, Logger, SettingKey}
+import sbt.{Def, Logger}
 
 import scala.util.{Failure, Success, Try}
 
 trait UpdateStack {
+
+  import cloudformation.CloudformationPlugin.autoImport._
 
   def amazonCloudFormation(settings: AwscfSettings): AmazonCloudFormationClient
 
@@ -43,13 +44,14 @@ trait UpdateStack {
     waitForCompletion(client, stack.stackName, log)
   }
 
-  def updateStackTask(awscfSettings: SettingKey[AwscfSettings]) = Def.inputTask {
+  def updateStackTask = Def.inputTask {
     val log = streams.value.log
+    val settings = awscfSettings.value
     spaceDelimited("<stage>, <shortName>").parsed match {
       case Seq(stage, shortName) => {
         (for {
           stack <- Try(awscfStacks.value.get(shortName).getOrElse(throw new RuntimeException()))
-          _ <- update(awscfSettings.value, stage, stack, log)
+          _ <- update(settings, stage, stack, log)
         } yield ()) match {
           case Success(_) => ()
           case Failure(t) => {

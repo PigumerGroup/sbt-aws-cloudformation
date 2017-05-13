@@ -1,6 +1,6 @@
 package cloudformation
 
-import jp.pigumer.sbt.cloud.aws.cloudformation.{CloudFormationProvider, CreateStack, DeleteStack, UpdateStack}
+import jp.pigumer.sbt.cloud.aws.cloudformation._
 import jp.pigumer.sbt.cloud.aws.s3.{S3Provider, SyncTemplates}
 
 object CloudformationTasks
@@ -9,5 +9,6 @@ object CloudformationTasks
   with CloudFormationProvider
   with CreateStack
   with DeleteStack
-  with UpdateStack {
+  with UpdateStack
+  with ValidateTemplate {
 }

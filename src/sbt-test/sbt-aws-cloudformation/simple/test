@@ -1,5 +1,9 @@
 > awscfSyncTemplates test
 
+-> awscfValidateTemplate test invalid/test1.txt
+
+> awscfValidateTemplate test test1.yaml
+
 -> awscfCreateStack test fail
 
 > awscfCreateStack test test

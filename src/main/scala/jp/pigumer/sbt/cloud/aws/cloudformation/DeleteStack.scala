@@ -25,13 +25,14 @@ trait DeleteStack {
     waitForCompletion(client, stack.stackName, log)
   }
 
-  def deleteStackTask(awscfSettings: SettingKey[AwscfSettings]) = Def.inputTask {
+  def deleteStackTask = Def.inputTask {
     val log = streams.value.log
+    val settings = awscfSettings.value
     spaceDelimited("<stage>, <shortName>").parsed match {
       case Seq(stage, shortName) => {
         (for {
           stack <- Try(awscfStacks.value.get(shortName).getOrElse(throw new RuntimeException()))
-          _ <- delete(awscfSettings.value, stage, stack, log)
+          _ <- delete(settings, stage, stack, log)
         } yield ()) match {
           case Success(_) => ()
           case Failure(t) => {

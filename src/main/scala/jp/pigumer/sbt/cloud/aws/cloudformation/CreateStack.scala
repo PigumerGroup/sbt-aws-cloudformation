@@ -44,13 +44,14 @@ trait CreateStack {
     waitForCompletion(client, stack.stackName, log)
   }
 
-  def createStackTask(awscfSettings: SettingKey[AwscfSettings]) = Def.inputTask {
+  def createStackTask = Def.inputTask {
     val log = streams.value.log
+    val settings = awscfSettings.value
     spaceDelimited("<stage>, <shortName>").parsed match {
       case Seq(stage, shortName) => {
         (for {
           stack <- Try(awscfStacks.value.get(shortName).getOrElse(throw new RuntimeException()))
-          _ <- create(awscfSettings.value, stage, stack, log)
+          _ <- create(settings, stage, stack, log)
         } yield ()) match {
           case Success(_) => ()
           case Failure(t) => {

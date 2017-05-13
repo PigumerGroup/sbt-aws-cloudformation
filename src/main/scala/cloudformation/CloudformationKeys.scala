@@ -11,4 +11,5 @@ trait CloudformationKeys {
   val awscfCreateStack = inputKey[Unit]("")
   val awscfDeleteStack = inputKey[Unit]("")
   val awscfUpdateStack = inputKey[Unit]("")
+  val awscfValidateTemplate = inputKey[Unit]("")
 }

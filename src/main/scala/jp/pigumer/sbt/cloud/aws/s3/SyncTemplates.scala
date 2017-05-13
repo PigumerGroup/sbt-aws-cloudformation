@@ -11,6 +11,8 @@ import scala.util.{Failure, Success, Try}
 
 trait SyncTemplates {
 
+  import cloudformation.CloudformationPlugin.autoImport._
+
   def amazonS3Client(settings: AwscfSettings): AmazonS3Client
 
   private def put(client: AmazonS3Client, log: Logger, bucketName: String, key: String, file: java.io.File) {
@@ -29,10 +31,11 @@ trait SyncTemplates {
     put(client, log, awsSettings.bucketName, stage, awsSettings.templates)
   }
 
-  def syncTemplatesTask(awsSettings: SettingKey[AwscfSettings]) = Def.inputTask {
+  def syncTemplatesTask = Def.inputTask {
     val log = streams.value.log
+    val settings = awscfSettings.value
     spaceDelimited("<stage>").parsed match {
-      case Seq(stage) => uploads(awsSettings.value, stage, log) match {
+      case Seq(stage) => uploads(settings, stage, log) match {
         case Success(_) => ()
         case Failure(t) => {
           sys.error(t.toString)
