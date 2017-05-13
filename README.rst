@@ -36,3 +36,6 @@ sbt-aws-cloudformation
 
   awscfValidateTemplate <stage> <templateName>
 
+  awscfListStacks
+  awscfListExports
+

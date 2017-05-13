@@ -10,6 +10,10 @@
 
 > awscfUpdateStack test testu
 
+> awscfListExports
+
+> awscfListStacks
+
 > awscfDeleteStack test test
 
 -> awscfCreateStack test fail2

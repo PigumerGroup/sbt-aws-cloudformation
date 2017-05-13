@@ -1,5 +1,6 @@
 package cloudformation
 
+import com.amazonaws.services.cloudformation.model.StackSummary
 import sbt._
 
 trait CloudformationKeys {
@@ -11,5 +12,9 @@ trait CloudformationKeys {
   val awscfCreateStack = inputKey[Unit]("")
   val awscfDeleteStack = inputKey[Unit]("")
   val awscfUpdateStack = inputKey[Unit]("")
+
   val awscfValidateTemplate = inputKey[Unit]("")
+
+  val awscfListExports = taskKey[Seq[AwscfExport]]("")
+  val awscfListStacks = taskKey[Seq[StackSummary]]("")
 }

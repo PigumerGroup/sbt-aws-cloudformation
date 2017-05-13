@@ -10,5 +10,7 @@ object CloudformationTasks
   with CreateStack
   with DeleteStack
   with UpdateStack
-  with ValidateTemplate {
+  with ValidateTemplate
+  with ListExports
+  with ListStacks {
 }

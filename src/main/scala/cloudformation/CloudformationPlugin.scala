@@ -19,6 +19,9 @@ object CloudformationPlugin extends AutoPlugin {
     awscfDeleteStack := CloudformationTasks.deleteStackTask.evaluated,
     awscfUpdateStack := CloudformationTasks.updateStackTask.evaluated,
 
-    awscfValidateTemplate := CloudformationTasks.validateTemplateTask.evaluated
+    awscfValidateTemplate := CloudformationTasks.validateTemplateTask.evaluated,
+
+    awscfListStacks := CloudformationTasks.listStacksTask.value,
+    awscfListExports := CloudformationTasks.listExportsTask.value
   )
 }
