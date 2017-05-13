@@ -8,7 +8,7 @@ fly execute::
     -c ci/build.yaml \
     -i source=.
 
-fly set-pipeline:
+fly set-pipeline::
 
   fly -t concourseci login -c <YOUR CONCOURSE CI URL>
   fly -t concourseci set-pipeline \
