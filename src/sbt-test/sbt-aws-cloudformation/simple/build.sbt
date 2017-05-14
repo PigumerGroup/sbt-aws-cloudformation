@@ -1,5 +1,7 @@
 import cloudformation._
 
+val role = sys.env.get("ROLE_ARN")
+
 lazy val root = (project in file(".")).
   enablePlugins(CloudformationPlugin).
   settings(
@@ -8,7 +10,8 @@ lazy val root = (project in file(".")).
     awscfSettings := AwscfSettings(
       region = "ap-northeast-1",
       bucketName = "jp-pigumer-test",
-      templates = file("cloudformation")
+      templates = file("cloudformation"),
+      roleARN = role
     ),
     awscfStacks := Map(
       "test" → CloudformationStack(

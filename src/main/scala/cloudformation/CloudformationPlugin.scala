@@ -13,7 +13,7 @@ object CloudformationPlugin extends AutoPlugin {
     awscfSettings := awscfSettings.value,
     awscfStacks := awscfStacks.value,
 
-    awscfSyncTemplates := CloudformationTasks.syncTemplatesTask.evaluated,
+    awscfUploadTemplates := CloudformationTasks.uploadTemplatesTask.evaluated,
 
     awscfCreateStack := CloudformationTasks.createStackTask.evaluated,
     awscfDeleteStack := CloudformationTasks.deleteStackTask.evaluated,

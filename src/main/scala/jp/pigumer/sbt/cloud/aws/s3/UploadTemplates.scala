@@ -9,7 +9,7 @@ import sbt.complete.DefaultParsers._
 
 import scala.util.{Failure, Success, Try}
 
-trait SyncTemplates {
+trait UploadTemplates {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
@@ -31,7 +31,7 @@ trait SyncTemplates {
     put(client, log, awsSettings.bucketName, stage, awsSettings.templates)
   }
 
-  def syncTemplatesTask = Def.inputTask {
+  def uploadTemplatesTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
     spaceDelimited("<stage>").parsed match {
