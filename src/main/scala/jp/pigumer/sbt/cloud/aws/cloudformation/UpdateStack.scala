@@ -40,7 +40,7 @@ trait UpdateStack {
       withParameters(params.asJava)
 
     val client = amazonCloudFormation(settings)
-    client.updateStack(request)
+    client.updateStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log)
   }
 

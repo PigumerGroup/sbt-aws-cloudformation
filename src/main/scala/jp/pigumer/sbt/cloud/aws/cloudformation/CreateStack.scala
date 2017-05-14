@@ -41,7 +41,7 @@ trait CreateStack {
       withParameters(params.asJava)
 
     val client = amazonCloudFormation(settings)
-    client.createStack(request)
+    client.createStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log)
   }
 

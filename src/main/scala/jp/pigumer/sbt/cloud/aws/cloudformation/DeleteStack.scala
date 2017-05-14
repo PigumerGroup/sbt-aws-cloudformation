@@ -25,7 +25,7 @@ trait DeleteStack {
       withStackName(stack.stackName)
 
     val client = amazonCloudFormation(settings)
-    client.deleteStack(request)
+    client.deleteStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log)
   }
 

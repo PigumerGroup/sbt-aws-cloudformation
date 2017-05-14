@@ -11,11 +11,11 @@ import scala.util.{Failure, Success, Try}
 trait CloudFormationProvider {
 
   lazy val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient = settings ⇒ {
-      AmazonCloudFormationClientBuilder.
-        standard.
-        withCredentials(settings.credentialsProvider).
-        withRegion(settings.region).
-        build.asInstanceOf[AmazonCloudFormationClient]
+    val builder = AmazonCloudFormationClientBuilder.
+      standard.
+      withCredentials(settings.credentialsProvider).
+      withRegion(settings.region)
+    builder.build.asInstanceOf[AmazonCloudFormationClient]
   }
 
   def url(awsSettings: AwscfSettings, stage: String, template: String): String =

@@ -17,7 +17,8 @@ sbt-aws-cloudformation
       awscfSettings := AwscfSettings(
         region = <YOUR_REGION_NAME>,
         bucketName = <YOUR_BUCKET_NAME>,
-        templates = file(<YOUR_TEMPLATES>)
+        templates = file(<YOUR_TEMPLATES>),
+        roleARN = None
       ),
       awscfStacks := Map(<SHORT_STACK_NAME> → CloudformationStack(
         stackName = <STACK_NAME>,
