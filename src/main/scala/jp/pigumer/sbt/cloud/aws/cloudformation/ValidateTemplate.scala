@@ -40,11 +40,12 @@ trait ValidateTemplate {
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒ {
+            log.trace(t)
             sys.error(t.toString)
           }
         }
       }
-      case _ ⇒ sys.error("error")
+      case _ ⇒ sys.error("Usage: <templateName>")
     }
   }
 }

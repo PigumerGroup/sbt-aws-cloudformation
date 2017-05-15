@@ -47,19 +47,20 @@ trait UpdateStack {
   def updateStackTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
-    spaceDelimited("<stage>, <shortName>").parsed match {
+    spaceDelimited("<stage> <shortName>").parsed match {
       case Seq(stage, shortName) ⇒ {
         (for {
-          stack ← Try(awscfStacks.value.get(shortName).getOrElse(throw new RuntimeException()))
+          stack ← Try(awscfStacks.value.get(shortName).getOrElse(sys.error(s"${shortName} of the stack is not defined")))
           _ ← update(settings, stage, stack, log)
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒ {
-            sys.error(t.toString)
+            log.trace(t)
+            sys.error(t.getMessage)
           }
         }
       }
-      case _ ⇒ sys.error("error")
+      case _ ⇒ sys.error("Usage: <stage> <shortName>")
     }
   }
 }

@@ -1,3 +1,5 @@
+-> awscfValidateTemplate
+
 -> awscfValidateTemplate invalid/test1.txt
 
 > awscfValidateTemplate test1.yaml

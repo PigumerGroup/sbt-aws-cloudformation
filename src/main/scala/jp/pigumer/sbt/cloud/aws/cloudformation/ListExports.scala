@@ -57,7 +57,7 @@ object ListExports {
     val list: Seq[Export] = result.getExports.asScala.toSeq
     list.foreach(r ⇒
       exportList += AwscfExport(exportingStackId = r.getExportingStackId,
-        stackName = stacks.get(r.getExportingStackId).map(_.getStackName).getOrElse(""),
+        stackName = stacks.get(r.getExportingStackId).map(_.getStackName).getOrElse(throw new RuntimeException(s"${r.getExportingStackId} is unknown stack")),
         name = r.getName,
         value = r.getValue)
     )
