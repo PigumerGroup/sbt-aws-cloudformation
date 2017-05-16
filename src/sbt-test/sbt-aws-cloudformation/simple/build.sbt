@@ -42,6 +42,13 @@ lazy val root = (project in file(".")).
       "fail2" → CloudformationStack(
         stackName = "test2",
         template = "test2.yaml"
+      ),
+      "dynamodb" → CloudformationStack(
+        stackName = "dynamodb",
+        template = "dynamodb.yaml",
+        ttl = Seq(AwscfTTLSettings(tableName = "test",
+          attributeName = "expiration",
+          enabled = true))
       )
     )
   )

@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.{AwscfSettings, CloudformationStack}
+import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.{Parameter, UpdateStackRequest}
 import sbt.Def.spaceDelimited
@@ -14,6 +14,8 @@ trait UpdateStack {
   import cloudformation.CloudformationPlugin.autoImport._
 
   val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+
+  def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
   def url(awscfSettings: AwscfSettings, stage: String, template: String): String
 
@@ -52,6 +54,7 @@ trait UpdateStack {
         (for {
           stack ← Try(awscfStacks.value.get(shortName).getOrElse(sys.error(s"${shortName} of the stack is not defined")))
           _ ← update(settings, stage, stack, log)
+          _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒ {

@@ -1,6 +1,7 @@
 package cloudformation
 
 import com.amazonaws.services.cloudformation.model.StackSummary
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import sbt._
 
 trait CloudformationKeys {

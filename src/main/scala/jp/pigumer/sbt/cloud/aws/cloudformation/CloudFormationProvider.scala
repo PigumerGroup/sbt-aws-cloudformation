@@ -2,7 +2,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.model.{DescribeStacksRequest, StackStatus}
-import com.amazonaws.services.cloudformation.{AmazonCloudFormationClient, AmazonCloudFormationClientBuilder}
+import com.amazonaws.services.cloudformation.{AmazonCloudFormationAsyncClient, AmazonCloudFormationAsyncClientBuilder, AmazonCloudFormationClient, AmazonCloudFormationClientBuilder}
 import sbt.Logger
 
 import scala.collection.JavaConverters._
@@ -18,6 +18,14 @@ trait CloudFormationProvider {
     builder.build.asInstanceOf[AmazonCloudFormationClient]
   }
 
+  lazy val amazonCloudFormationAsync: AwscfSettings ⇒ AmazonCloudFormationAsyncClient = settings ⇒ {
+    val builder = AmazonCloudFormationAsyncClientBuilder.
+      standard.
+      withCredentials(settings.credentialsProvider).
+      withRegion(settings.region)
+    builder.build.asInstanceOf[AmazonCloudFormationAsyncClient]
+  }
+
   def url(awsSettings: AwscfSettings, stage: String, template: String): String =
     s"https://${awsSettings.bucketName}.s3.amazonaws.com/${stage}/${awsSettings.templates.getName}/${template}"
 
@@ -28,7 +36,7 @@ trait CloudFormationProvider {
     var completed = false
     while (!completed) {
       completed = Try(client.describeStacks(request).getStacks.asScala.toSeq) match {
-        case Failure(t) ⇒ true
+        case Failure(_) ⇒ true
         case Success(stacks) ⇒ if (stacks.isEmpty) {
           log.warn("Stack has been deleted")
           true

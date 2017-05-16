@@ -3,7 +3,7 @@ sbt-aws-cloudformation
 
 ::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.0.0")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.1.0")
 
 ::
 
@@ -24,7 +24,11 @@ sbt-aws-cloudformation
         stackName = <STACK_NAME>,
         template = <YOUR_TEMPLATE>,
         parameters = Map(<KEY> → <VALUE>),
-        capabilities = Seq("CAPABILITY_NAMED_IAM")))
+        capabilities = Seq("CAPABILITY_NAMED_IAM")),
+        ttl = Seq(AwscfTTLSettings(
+          tableName = <DYNAMODB TABLE NAME>,
+          attributeName = <TTL ATTRIBUTE NAME>,
+          enabled = <TTL ENABLED>))
     )
 
 ::

@@ -10,6 +10,8 @@
 
 > awscfDeleteStack test test2
 
+> awscfDeleteStack test dynamodb
+
 -> awscfCreateStack test fail
 
 > awscfCreateStack test test
@@ -29,3 +31,7 @@
 > awscfUpdateStack test test2u
 
 > awscfDeleteStack test test2
+
+> awscfCreateStack test dynamodb
+
+> awscfDeleteStack test dynamodb
