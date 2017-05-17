@@ -1,8 +1,8 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
-import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter}
+import com.amazonaws.services.cloudformation.{AmazonCloudFormationAsyncClient, AmazonCloudFormationClient}
+import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack}
 import sbt.Def._
 import sbt.Keys.streams
 import sbt._
@@ -16,11 +16,13 @@ trait CreateStack {
 
   val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
 
-  def url(awsSettings: AwscfSettings, stage: String, template: String): String
+  protected def url(awsSettings: AwscfSettings, stage: String, template: String): String
 
-  def waitForCompletion(amazonCloudFormation: AmazonCloudFormationClient, stackName: String, log: Logger): Unit
+  protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
-  def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
+  protected def waitForCompletion(client: AmazonCloudFormationClient,
+                                  stackName: String,
+                                  log: Logger): Try[Seq[Stack]]
 
   private def create(settings: AwscfSettings,
                      stage: String,
@@ -43,8 +45,13 @@ trait CreateStack {
       withParameters(params.asJava)
 
     val client = amazonCloudFormation(settings)
+
+    log.info(s"Create ${stack.stackName}")
     client.createStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
-    waitForCompletion(client, stack.stackName, log)
+    waitForCompletion(client, stack.stackName, log) match {
+      case Failure(t) ⇒ throw t
+      case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
+    }
   }
 
   def createStackTask = Def.inputTask {

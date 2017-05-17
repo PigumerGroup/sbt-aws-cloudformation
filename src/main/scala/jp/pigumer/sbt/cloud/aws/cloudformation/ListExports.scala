@@ -14,9 +14,9 @@ trait ListExports {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
 
-  def url(awscfSettings: AwscfSettings, stage: String, template: String): String
+  protected def url(awscfSettings: AwscfSettings, stage: String, template: String): String
 
   private def output(export: AwscfExport, log: Logger): Unit = {
     val s = s"${export.stackName} ${export.name} ${export.value}"
@@ -61,7 +61,7 @@ object ListExports {
         name = r.getName,
         value = r.getValue)
     )
-    if (null == result.getNextToken)
+    if (result.getNextToken == null)
       return ()
     val r = new ListExportsRequest().withNextToken(result.getNextToken)
     exports(client, r, stacks, exportList)

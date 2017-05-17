@@ -2,7 +2,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
-import com.amazonaws.services.cloudformation.model.{Parameter, UpdateStackRequest}
+import com.amazonaws.services.cloudformation.model.{Parameter, Stack, UpdateStackRequest}
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
 import sbt.{Def, Logger}
@@ -13,13 +13,15 @@ trait UpdateStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
 
-  def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
+  protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
-  def url(awscfSettings: AwscfSettings, stage: String, template: String): String
+  protected def url(awscfSettings: AwscfSettings, stage: String, template: String): String
 
-  def waitForCompletion(amazonCloudFormation: AmazonCloudFormationClient, stackName: String, log: Logger): Unit
+  protected def waitForCompletion(client: AmazonCloudFormationClient,
+                                  stackName: String,
+                                  log: Logger): Try[Seq[Stack]]
 
   private def update(settings: AwscfSettings,
                      stage: String,
@@ -41,9 +43,14 @@ trait UpdateStack {
       withCapabilities(stack.capabilities.asJava).
       withParameters(params.asJava)
 
+    log.info(s"Update ${stack.stackName}")
+
     val client = amazonCloudFormation(settings)
     client.updateStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
-    waitForCompletion(client, stack.stackName, log)
+    waitForCompletion(client, stack.stackName, log) match {
+      case Failure(t) ⇒ throw t
+      case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
+    }
   }
 
   def updateStackTask = Def.inputTask {

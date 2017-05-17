@@ -5,17 +5,20 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import sbt._
 
 trait CloudformationKeys {
-  val awscfSettings = settingKey[AwscfSettings]("")
-  val awscfStacks = settingKey[Map[String, CloudformationStack]]("")
 
-  val awscfUploadTemplates = inputKey[Unit]("")
+  val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
+  val awscfStacks = settingKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
 
-  val awscfCreateStack = inputKey[Unit]("")
-  val awscfDeleteStack = inputKey[Unit]("")
-  val awscfUpdateStack = inputKey[Unit]("")
+  val awscfUploadTemplates = inputKey[Unit]("Upload templates to AWS S3 Bucket")
 
-  val awscfValidateTemplate = inputKey[Unit]("")
+  val awscfCreateStack = inputKey[Unit]("Create stack")
+  val awscfDeleteStack = inputKey[Unit]("Delete stack")
+  val awscfUpdateStack = inputKey[Unit]("Update stack")
 
-  val awscfListExports = taskKey[Seq[AwscfExport]]("")
-  val awscfListStacks = taskKey[Seq[StackSummary]]("")
+  val awscfValidateTemplate = inputKey[Unit]("Validate template")
+
+  val awscfListExports = taskKey[Seq[AwscfExport]]("List exports")
+  val awscfListStacks = taskKey[Seq[StackSummary]]("List stacks")
+
+  val awscfUpload = inputKey[Unit]("Upload AWS S3 Bucket")
 }

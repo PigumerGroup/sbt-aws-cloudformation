@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
 
 trait UpdateTimeToLive {
 
-  val amazonDynamoDB: AwscfSettings ⇒ AmazonDynamoDBClient
+  protected val amazonDynamoDB: AwscfSettings ⇒ AmazonDynamoDBClient
 
   def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit = {
     val client = amazonDynamoDB(settings)

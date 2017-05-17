@@ -5,7 +5,9 @@ import com.amazonaws.services.dynamodbv2.{AmazonDynamoDBClient, AmazonDynamoDBCl
 
 trait DynamoDBProvider {
 
-  lazy val amazonDynamoDB: AwscfSettings ⇒ AmazonDynamoDBClient = settings ⇒ {
+  import cloudformation.CloudformationPlugin.autoImport._
+
+  protected lazy val amazonDynamoDB: AwscfSettings ⇒ AmazonDynamoDBClient = settings ⇒ {
     val builder = AmazonDynamoDBClientBuilder.
       standard().
       withCredentials(settings.credentialsProvider).

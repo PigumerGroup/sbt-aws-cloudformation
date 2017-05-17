@@ -41,7 +41,28 @@ trait UploadTemplates {
           sys.error(t.toString)
         }
       }
-      case _ ⇒ sys.error("error")
+      case _ ⇒ sys.error("Usage: uploadTemplates <stage>")
+    }
+  }
+
+  private def upload(awscfSettings: AwscfSettings, dist: String, bucket: String, key: String, log: Logger) = Try {
+    val client = amazonS3Client(awscfSettings)
+    log.info(s"upload ${dist} to ${bucket}")
+    val request = new PutObjectRequest(bucket, key, new File(dist))
+    client.putObject(request)
+  }
+
+  def uploadTask = Def.inputTask {
+    val log = streams.value.log
+    val settings = awscfSettings.value
+    spaceDelimited("<dist> <bucket> <key>").parsed match {
+      case Seq(dist, bucket, key) ⇒ upload(settings, dist, bucket, key, log) match {
+        case Success(_) ⇒ ()
+        case Failure(t) ⇒ {
+          sys.error(t.toString)
+        }
+      }
+      case _ ⇒ sys.error("Usage: upload <dist> <bucket> <key>")
     }
   }
 }

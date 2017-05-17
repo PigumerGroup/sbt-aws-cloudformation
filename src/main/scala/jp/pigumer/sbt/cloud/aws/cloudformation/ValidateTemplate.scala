@@ -16,7 +16,7 @@ trait ValidateTemplate {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
 
   private def validateTemplate(settings: AwscfSettings,
                                templateName: String,
