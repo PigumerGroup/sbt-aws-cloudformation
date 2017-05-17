@@ -3,7 +3,7 @@ sbt-aws-cloudformation
 
 ::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.1.0")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.1.1")
 
 ::
 
