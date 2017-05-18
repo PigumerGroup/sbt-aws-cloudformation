@@ -3,7 +3,8 @@ sbt-aws-cloudformation
 
 A sbt plugin for AWS CloudFormation.
 
-# Installation
+Installation
+------------
 
 project/plugins.sbt::
 
@@ -15,7 +16,8 @@ your build.sbt::
   enablePlugins(CloudformationPlugin)
 
 
-# Usage
+Usage
+-----
 
 ``awscfCreateBucket <stackName>``
 
@@ -70,7 +72,4 @@ ex build.sbt::
           attributeName = <TTL ATTRIBUTE NAME>,
           enabled = <TTL ENABLED>))
     )
-
-::
-
 
