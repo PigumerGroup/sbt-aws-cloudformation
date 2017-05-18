@@ -25,7 +25,7 @@ Create a bucket using the AWS CloudFormation Stack.
 
 ``awscfUploadTemplates <stage>``
 
-Upload the template to the bucket.
+Upload templates to the bucket.
 
 ``awscfCreateStack <stage> <shortName>``
 
