@@ -33,6 +33,8 @@ sbt-aws-cloudformation
 
 ::
 
+  awscfCreateBucket <stackName>
+
   awscfUploadTemplates <stage>
 
   awscfCreateStack <stage> <shortName>

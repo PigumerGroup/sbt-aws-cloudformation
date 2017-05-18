@@ -1,3 +1,5 @@
+> awscfCreateBucket CreateBucketTest
+
 -> awscfValidateTemplate
 
 -> awscfValidateTemplate invalid/test1.txt

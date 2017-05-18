@@ -1,7 +1,6 @@
 package cloudformation
 
 import com.amazonaws.services.cloudformation.model.StackSummary
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import sbt._
 
 trait CloudformationKeys {
@@ -21,4 +20,6 @@ trait CloudformationKeys {
   val awscfListStacks = taskKey[Seq[StackSummary]]("List stacks")
 
   val awscfUpload = inputKey[Unit]("Upload AWS S3 Bucket")
+
+  val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 }

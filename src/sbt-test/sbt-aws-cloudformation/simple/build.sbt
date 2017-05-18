@@ -1,6 +1,7 @@
 import cloudformation._
 
 val role = sys.env.get("ROLE_ARN")
+val bn = sys.env.get("BUCKET_NAME").get
 
 lazy val root = (project in file(".")).
   enablePlugins(CloudformationPlugin).
@@ -9,7 +10,7 @@ lazy val root = (project in file(".")).
     scalaVersion := "2.12.2",
     awscfSettings := AwscfSettings(
       region = "ap-northeast-1",
-      bucketName = "jp-pigumer-test",
+      bucketName = bn,
       templates = file("cloudformation"),
       roleARN = role
     ),

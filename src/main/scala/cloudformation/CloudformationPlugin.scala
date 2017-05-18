@@ -24,6 +24,8 @@ object CloudformationPlugin extends AutoPlugin {
     awscfListStacks := CloudformationTasks.listStacksTask.value,
     awscfListExports := CloudformationTasks.listExportsTask.value,
 
-    awscfUpload := CloudformationTasks.uploadTask.evaluated
+    awscfUpload := CloudformationTasks.uploadTask.evaluated,
+
+    awscfCreateBucket := CloudformationTasks.createBucketTask.evaluated
   )
 }
