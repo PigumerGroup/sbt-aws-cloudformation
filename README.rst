@@ -1,11 +1,51 @@
 sbt-aws-cloudformation
 ======================
 
-::
+A sbt plugin for AWS CloudFormation.
+
+# Installation
+
+project/plugins.sbt::
 
   addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.1.2")
 
-::
+
+your build.sbt::
+
+  enablePlugins(CloudformationPlugin)
+
+
+# Usage
+
+``awscfCreateBucket <stackName>``
+
+Create a bucket using the AWS CloudFormation Stack.
+
+``awscfUploadTemplates <stage>``
+
+Upload the template to the bucket.
+
+``awscfCreateStack <stage> <shortName>``
+
+Create a AWS CloudFormation stack.
+
+``awscfUpdateStack <stage> <shortName>``
+
+Update a AWS CloudFormation stack.
+
+``awscfDeleteStack <stage> <shortName>``
+
+Delete a AWS CloudFormation stack.
+
+``awscfValidateTemplate <templateName>``
+
+Validate a AWS CloudFormation template.
+
+``awscfListStacks``
+
+``awscfListExports``
+
+ex build.sbt::
 
   import cloudformation._
 
@@ -33,16 +73,4 @@ sbt-aws-cloudformation
 
 ::
 
-  awscfCreateBucket <stackName>
-
-  awscfUploadTemplates <stage>
-
-  awscfCreateStack <stage> <shortName>
-  awscfUpdateStack <stage> <shortName>
-  awscfDeleteStack <stage> <shortName>
-
-  awscfValidateTemplate <templateName>
-
-  awscfListStacks
-  awscfListExports
 
