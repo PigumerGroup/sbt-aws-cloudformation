@@ -8,7 +8,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.1.2")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.2.0-SNAPSHOT")
 
 
 your build.sbt::
@@ -57,6 +57,7 @@ ex build.sbt::
       version := "0.1",
       scalaVersion := "2.12.2",
       awscfSettings := AwscfSettings(
+        projectName = Some("example/"),
         region = <YOUR_REGION_NAME>,
         bucketName = <YOUR_BUCKET_NAME>,
         templates = file(<YOUR_TEMPLATES>),

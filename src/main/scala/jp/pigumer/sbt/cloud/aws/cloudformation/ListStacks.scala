@@ -16,8 +16,6 @@ trait ListStacks {
 
   protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
 
-  protected def url(awscfSettings: AwscfSettings, stage: String, template: String): String
-
   private def output(stack: StackSummary, log: Logger): Unit = {
     val s = s"${stack.getStackName} ${stack.getStackStatus}"
     log.info(s)

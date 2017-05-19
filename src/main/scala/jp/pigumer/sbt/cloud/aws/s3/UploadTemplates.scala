@@ -1,5 +1,7 @@
 package jp.pigumer.sbt.cloud.aws.s3
 
+import java.io.File
+
 import cloudformation.AwscfSettings
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.PutObjectRequest
@@ -15,20 +17,27 @@ trait UploadTemplates {
 
   val amazonS3Client: AwscfSettings ⇒ AmazonS3Client
 
-  private def put(client: AmazonS3Client, log: Logger, bucketName: String, key: String, file: java.io.File) {
+  protected def url(bucketName: String, stage: String, templates: File, template: String): String
+
+  private def put(settings: AwscfSettings,
+                  client: AmazonS3Client,
+                  log: Logger,
+                  key: String,
+                  file: java.io.File) {
     if (file.isFile) {
-      val k = s"${key}/${file.getName}"
-      log.info(s"upload ${k} to ${bucketName}")
-      val request = new PutObjectRequest(bucketName, s"${key}/${file.getName}", file)
+      val u = url(settings.bucketName, key, settings.templates, file.getName)
+      log.info(s"upload ${file.getName} to ${u}")
+      val request = new PutObjectRequest(settings.bucketName, s"${key}/${file.getName}", file)
       client.putObject(request)
       return
     }
-    file.listFiles.foreach(f ⇒ put(client, log, bucketName, s"${key}/${file.getName}", f))
+    file.listFiles.foreach(f ⇒ put(settings, client, log, s"${key}/${file.getName}", f))
   }
 
-  private def uploads(awsSettings: AwscfSettings, stage: String, log: Logger) = Try {
-    val client = amazonS3Client(awsSettings)
-    put(client, log, awsSettings.bucketName, stage, awsSettings.templates)
+  private def uploads(settings: AwscfSettings, stage: String, log: Logger) = Try {
+    val dir = settings.projectName.map(p ⇒ s"${p}${stage}").getOrElse(stage)
+    val client = amazonS3Client(settings)
+    put(settings, client, log, dir, settings.templates)
   }
 
   def uploadTemplatesTask = Def.inputTask {
@@ -45,10 +54,16 @@ trait UploadTemplates {
     }
   }
 
-  private def upload(awscfSettings: AwscfSettings, dist: String, bucket: String, key: String, log: Logger) = Try {
-    val client = amazonS3Client(awscfSettings)
-    log.info(s"upload ${dist} to ${bucket}")
-    val request = new PutObjectRequest(bucket, key, new File(dist))
+  private def upload(settings: AwscfSettings,
+                     bucketName: String,
+                     dist: String,
+                     key: String,
+                     log: Logger) = Try {
+    val client = amazonS3Client(settings)
+    val u = s"https://${bucketName}.s3.amazonaws.com/${key}"
+
+    log.info(s"upload ${dist} to ${u}")
+    val request = new PutObjectRequest(settings.bucketName, key, new File(dist))
     client.putObject(request)
   }
 
@@ -56,7 +71,7 @@ trait UploadTemplates {
     val log = streams.value.log
     val settings = awscfSettings.value
     spaceDelimited("<dist> <bucket> <key>").parsed match {
-      case Seq(dist, bucket, key) ⇒ upload(settings, dist, bucket, key, log) match {
+      case Seq(dist, bucket, key) ⇒ upload(settings, bucket, dist, key, log) match {
         case Success(_) ⇒ ()
         case Failure(t) ⇒ {
           sys.error(t.toString)

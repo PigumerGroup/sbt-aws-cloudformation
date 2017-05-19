@@ -1,7 +1,9 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
+import java.io.File
+
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
-import com.amazonaws.services.cloudformation.{AmazonCloudFormationAsyncClient, AmazonCloudFormationClient}
+import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
 import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack}
 import sbt.Def._
 import sbt.Keys.streams
@@ -16,7 +18,7 @@ trait CreateStack {
 
   val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
 
-  protected def url(awsSettings: AwscfSettings, stage: String, template: String): String
+  protected def url(bucketName: String, stage: String, templates: File, template: String): String
 
   protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
@@ -30,7 +32,8 @@ trait CreateStack {
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
 
-    val u = url(settings, stage, stack.template)
+    val dir = settings.projectName.map(p ⇒ s"${p}${stage}").getOrElse(stage)
+    val u = url(settings.bucketName, dir, settings.templates, stack.template)
     val params: Seq[Parameter] = stack.parameters.map {
       case (key, value) ⇒ {
         val p: Parameter = new Parameter().withParameterKey(key).withParameterValue(value)

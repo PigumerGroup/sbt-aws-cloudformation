@@ -6,6 +6,7 @@ import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsPro
 
 case class AwscfSettings(region: String = "us-east-1",
                          bucketName: String,
+                         projectName: Option[String] = None,
                          templates: File,
                          credentialsProvider: AWSCredentialsProviderChain = new DefaultAWSCredentialsProviderChain(),
                          roleARN: Option[String] = None)

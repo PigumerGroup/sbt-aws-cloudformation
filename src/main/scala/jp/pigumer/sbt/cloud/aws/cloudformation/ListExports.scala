@@ -16,8 +16,6 @@ trait ListExports {
 
   protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
 
-  protected def url(awscfSettings: AwscfSettings, stage: String, template: String): String
-
   private def output(export: AwscfExport, log: Logger): Unit = {
     val s = s"${export.stackName} ${export.name} ${export.value}"
     log.info(s)

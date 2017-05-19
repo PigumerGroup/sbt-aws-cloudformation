@@ -1,5 +1,7 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
+import java.io.File
+
 import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.model.{DescribeStacksRequest, Stack, StackStatus}
 import com.amazonaws.services.cloudformation.{AmazonCloudFormationClient, AmazonCloudFormationClientBuilder}
@@ -20,8 +22,8 @@ trait CloudFormationProvider {
     builder.build.asInstanceOf[AmazonCloudFormationClient]
   }
 
-  protected def url(awsSettings: AwscfSettings, stage: String, template: String): String =
-    s"https://${awsSettings.bucketName}.s3.amazonaws.com/${stage}/${awsSettings.templates.getName}/${template}"
+  protected def url(bucketName: String, stage: String, templates: File, template: String): String =
+    s"https://${bucketName}.s3.amazonaws.com/${stage}/${templates.getName}/${template}"
 
   @tailrec
   private def describeStacks(client: AmazonCloudFormationClient,
