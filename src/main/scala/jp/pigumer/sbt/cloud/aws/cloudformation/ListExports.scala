@@ -52,17 +52,22 @@ object ListExports {
                       stacks: Map[String, StackSummary],
                       exportList: mutable.MutableList[AwscfExport]): Unit = {
     val result = client.listExports(request)
-    val list: Seq[Export] = result.getExports.asScala.toSeq
+    val list: Seq[Export] = result.getExports.asScala
     list.foreach(r ⇒
       exportList += AwscfExport(exportingStackId = r.getExportingStackId,
-        stackName = stacks.get(r.getExportingStackId).map(_.getStackName).getOrElse(throw new RuntimeException(s"${r.getExportingStackId} is unknown stack")),
+        stackName = stacks.get(r.getExportingStackId).
+          map(_.getStackName).
+          getOrElse(throw new RuntimeException(s"${r.getExportingStackId} is unknown stack")),
         name = r.getName,
         value = r.getValue)
     )
-    if (result.getNextToken == null)
-      return ()
-    val r = new ListExportsRequest().withNextToken(result.getNextToken)
-    exports(client, r, stacks, exportList)
+    Option(result.getNextToken) match {
+      case Some(n) ⇒ {
+        request.withNextToken(n)
+        exports(client, request, stacks, exportList)
+      }
+      case None ⇒ None
+    }
   }
 
   def listExports(client: AmazonCloudFormationClient): Seq[AwscfExport] = {

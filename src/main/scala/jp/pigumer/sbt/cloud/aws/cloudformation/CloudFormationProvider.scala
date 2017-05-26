@@ -9,7 +9,6 @@ import sbt.Logger
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 import scala.util.Try
 
 trait CloudFormationProvider {
@@ -28,21 +27,25 @@ trait CloudFormationProvider {
   @tailrec
   private def describeStacks(client: AmazonCloudFormationClient,
                      request: DescribeStacksRequest,
-                     list: mutable.MutableList[Stack]): Unit = {
+                     list: Stream[Stack]): Stream[Stack] = {
     val result = client.describeStacks(request)
-    list ++= result.getStacks.asScala
-    if (result.getNextToken == null) {
-      return ()
+    val l = list ++ result.getStacks.asScala
+    Option(result.getNextToken) match {
+      case Some(n) ⇒ {
+        request.withNextToken(n)
+        describeStacks(client, request, l)
+      }
+      case None ⇒ l
     }
-    describeStacks(client, request, list)
   }
 
   @tailrec
   private def allCompletion(client: AmazonCloudFormationClient,
                             request: DescribeStacksRequest,
-                            stacks: Seq[Stack],
-                            log: Logger): Seq[Stack] = {
-    val completed = stacks.map(_.getStackStatus).forall(
+                            stacks: Stream[Stack],
+                            log: Logger): Stream[Stack] = {
+    val stackStatus = stacks.map(_.getStackStatus)
+    val completed = stackStatus.forall(
       s ⇒ {
         s == StackStatus.CREATE_COMPLETE.toString ||
         s == StackStatus.CREATE_FAILED.toString ||
@@ -54,25 +57,26 @@ trait CloudFormationProvider {
     )
     if (completed) {
       stacks.foreach(s ⇒ log.debug(s"${s.getStackName} ${s.getStackStatus} ${s.getStackStatusReason}"))
-      return stacks
+      stacks
+    } else {
+      Thread.sleep(10000)
+
+      val s = describeStacks(client, request, Stream.empty)
+      allCompletion(client, request, s, log)
     }
-
-    Thread.sleep(10000)
-
-    val list = mutable.MutableList[Stack]()
-    describeStacks(client, request, list)
-    allCompletion(client, request, list, log)
   }
 
   protected def waitForCompletion(client: AmazonCloudFormationClient,
                                   stackName: String,
-                                  log: Logger): Try[Seq[Stack]] = Try {
+                                  log: Logger): Try[Seq[Stack]] = {
     val request = new DescribeStacksRequest().
       withStackName(stackName)
-    val list = mutable.MutableList[Stack]()
-    Try(describeStacks(client, request, list)).map(
-      _ ⇒ allCompletion(client, request, list, log)
-    ).getOrElse(Seq.empty[Stack])
+    Try(describeStacks(client, request, Stream.empty)) map {
+      l ⇒ allCompletion(client, request, l, log)
+    }
   }
 
 }
+
+case class CreateStackException(message: String = "Can't CREATE_STACK") extends RuntimeException
+case class UpdateStackException(message: String = "Can't UPDATE_STACK") extends RuntimeException

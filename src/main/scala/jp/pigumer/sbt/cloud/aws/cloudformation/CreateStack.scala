@@ -4,7 +4,7 @@ import java.io.File
 
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
-import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack}
+import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack, StackStatus}
 import sbt.Def._
 import sbt.Keys.streams
 import sbt._
@@ -53,7 +53,12 @@ trait CreateStack {
     client.createStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(t) ⇒ throw t
-      case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
+      case Success(r) ⇒ {
+        r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
+        if (!r.forall(_.getStackStatus == StackStatus.CREATE_COMPLETE.toString)) {
+          throw CreateStackException()
+        }
+      }
     }
   }
 

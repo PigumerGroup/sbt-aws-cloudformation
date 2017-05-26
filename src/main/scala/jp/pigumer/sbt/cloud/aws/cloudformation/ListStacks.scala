@@ -49,14 +49,17 @@ object ListStacks {
                      request: ListStacksRequest,
                      stackList: mutable.MutableList[StackSummary]): Unit = {
     val result = client.listStacks(request)
-    val list = result.getStackSummaries.asScala.toSeq
+    val list = result.getStackSummaries.asScala
     list.filterNot(r ⇒
       r.getStackStatus == StackStatus.DELETE_COMPLETE.toString
     ).foreach(r ⇒ stackList += r)
-    if (null == result.getNextToken)
-      return ()
-    val r = new ListStacksRequest().withNextToken(result.getNextToken)
-    stacks(client, r, stackList)
+    Option(result.getNextToken) match {
+      case None ⇒ ()
+      case Some(n) ⇒ {
+        request.withNextToken(n)
+        stacks(client, request, stackList)
+      }
+    }
   }
 
   def listStacks(client: AmazonCloudFormationClient): Seq[StackSummary] = {

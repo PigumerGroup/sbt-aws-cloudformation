@@ -4,7 +4,7 @@ import java.io.File
 
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
-import com.amazonaws.services.cloudformation.model.{Parameter, Stack, UpdateStackRequest}
+import com.amazonaws.services.cloudformation.model.{Parameter, Stack, StackStatus, UpdateStackRequest}
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
 import sbt.{Def, Logger}
@@ -52,7 +52,12 @@ trait UpdateStack {
     client.updateStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(t) ⇒ throw t
-      case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
+      case Success(r) ⇒ {
+        r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
+        if (!r.forall(_.getStackStatus == StackStatus.UPDATE_COMPLETE.toString)) {
+          throw UpdateStackException()
+        }
+      }
     }
   }
 
