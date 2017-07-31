@@ -18,7 +18,7 @@ trait CreateBucket {
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
-  private def createStack(settings: AwscfSettings, stackName: String, log: Logger): Try[Unit] = Try {
+  private def createStack(settings: AwscfSettings, stackName: String, bucketName: String, log: Logger): Try[Unit] = Try {
     import scala.collection.JavaConverters._
 
     val yaml =
@@ -42,11 +42,11 @@ trait CreateBucket {
       withParameters(Seq(
         new Parameter().
           withParameterKey("BucketName").
-          withParameterValue(settings.bucketName)).asJava)
+          withParameterValue(bucketName)).asJava)
 
     val client = amazonCloudFormation(settings)
 
-    log.info(s"Create ${stackName}")
+    log.info(s"Create ${stackName} ${bucketName}")
     client.createStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
     waitForCompletion(client, stackName, log) match {
       case Failure(t) ⇒ throw t
@@ -57,9 +57,9 @@ trait CreateBucket {
   def createBucketTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
-    spaceDelimited("<stackName>").parsed match {
-      case Seq(stackName) ⇒ {
-        createStack(settings, stackName, log) match {
+    spaceDelimited("<stackName> <bucketName>").parsed match {
+      case Seq(stackName, bucketName) ⇒ {
+        createStack(settings, stackName, bucketName, log) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒ {
             log.trace(t)
@@ -67,7 +67,16 @@ trait CreateBucket {
           }
         }
       }
-      case _ ⇒ sys.error("Usage: createBucket <stackName>")
+      case Seq(stackName) ⇒ {
+        createStack(settings, stackName, settings.bucketName, log) match {
+          case Success(_) ⇒ ()
+          case Failure(t) ⇒ {
+            log.trace(t)
+            sys.error(t.getMessage)
+          }
+        }
+      }
+      case _ ⇒ sys.error("Usage: createBucket <stackName> <bucketName>")
     }
   }
 }

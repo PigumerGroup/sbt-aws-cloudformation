@@ -17,40 +17,36 @@ trait UploadTemplates {
 
   val amazonS3Client: AwscfSettings ⇒ AmazonS3Client
 
-  protected def url(bucketName: String, stage: String, templates: File, template: String): String
+  protected def url(bucketName: String, dir: String, templates: File, template: String): String
 
   private def put(settings: AwscfSettings,
                   client: AmazonS3Client,
                   log: Logger,
-                  key: String,
-                  file: java.io.File) {
+                  dir: String,
+                  file: java.io.File): Unit = {
     if (file.isFile) {
-      val u = url(settings.bucketName, key, settings.templates, file.getName)
+      val u = url(settings.bucketName, dir, settings.templates, file.getName)
       log.info(s"upload ${file.getName} to ${u}")
-      val request = new PutObjectRequest(settings.bucketName, s"${key}/${file.getName}", file)
+      val request = new PutObjectRequest(settings.bucketName, s"${dir}/${file.getName}", file)
       client.putObject(request)
       return
     }
-    file.listFiles.foreach(f ⇒ put(settings, client, log, s"${key}/${file.getName}", f))
+    file.listFiles.foreach(f ⇒ put(settings, client, log, s"${dir}/${file.getName}", f))
   }
 
-  private def uploads(settings: AwscfSettings, stage: String, log: Logger) = Try {
-    val dir = settings.projectName.map(p ⇒ s"${p}${stage}").getOrElse(stage)
+  private def uploads(settings: AwscfSettings, log: Logger) = Try {
     val client = amazonS3Client(settings)
-    put(settings, client, log, dir, settings.templates)
+    put(settings, client, log, settings.dir, settings.templates)
   }
 
-  def uploadTemplatesTask = Def.inputTask {
+  def uploadTemplatesTask = Def.task {
     val log = streams.value.log
     val settings = awscfSettings.value
-    spaceDelimited("<stage>").parsed match {
-      case Seq(stage) ⇒ uploads(settings, stage, log) match {
-        case Success(_) ⇒ ()
-        case Failure(t) ⇒ {
-          sys.error(t.toString)
-        }
+    uploads(settings, log) match {
+      case Success(_) ⇒ ()
+      case Failure(t) ⇒ {
+        sys.error(t.toString)
       }
-      case _ ⇒ sys.error("Usage: uploadTemplates <stage>")
     }
   }
 

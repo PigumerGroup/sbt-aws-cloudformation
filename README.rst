@@ -8,7 +8,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "2.2.1")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "3.0.0")
 
 
 your build.sbt::
@@ -19,23 +19,23 @@ your build.sbt::
 Usage
 -----
 
-``awscfCreateBucket <stackName>``
+``awscfCreateBucket <stackName> <bucketName>``
 
 Create a bucket using the AWS CloudFormation Stack.
 
-``awscfUploadTemplates <stage>``
+``awscfUploadTemplates``
 
 Upload templates to the bucket.
 
-``awscfCreateStack <stage> <shortName>``
+``awscfCreateStack <shortName>``
 
 Create a AWS CloudFormation stack.
 
-``awscfUpdateStack <stage> <shortName>``
+``awscfUpdateStack <shortName>``
 
 Update a AWS CloudFormation stack.
 
-``awscfDeleteStack <stage> <shortName>``
+``awscfDeleteStack <shortName>``
 
 Delete a AWS CloudFormation stack.
 
@@ -55,9 +55,9 @@ ex build.sbt::
     enablePlugins(CloudformationPlugin).
     settings(
       version := "0.1",
-      scalaVersion := "2.12.2",
+      scalaVersion := "2.12.3",
       awscfSettings := AwscfSettings(
-        projectName = Some("example/"),
+        projectName = Some("example"),
         region = <YOUR_REGION_NAME>,
         bucketName = <YOUR_BUCKET_NAME>,
         templates = file(<YOUR_TEMPLATES>),

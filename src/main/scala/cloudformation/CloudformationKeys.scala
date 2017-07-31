@@ -8,7 +8,7 @@ trait CloudformationKeys {
   val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
   val awscfStacks = settingKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
 
-  val awscfUploadTemplates = inputKey[Unit]("Upload templates to AWS S3 Bucket")
+  val awscfUploadTemplates = taskKey[Unit]("Upload templates to AWS S3 Bucket")
 
   val awscfCreateStack = inputKey[Unit]("Create stack")
   val awscfDeleteStack = inputKey[Unit]("Delete stack")

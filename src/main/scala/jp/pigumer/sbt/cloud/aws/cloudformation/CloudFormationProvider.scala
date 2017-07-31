@@ -21,8 +21,10 @@ trait CloudFormationProvider {
     builder.build.asInstanceOf[AmazonCloudFormationClient]
   }
 
-  protected def url(bucketName: String, stage: String, templates: File, template: String): String =
-    s"https://${bucketName}.s3.amazonaws.com/${stage}/${templates.getName}/${template}"
+  protected def url(bucketName: String, dir: String, templates: File, template: String): String = {
+    val d = if (dir.isEmpty) "" else s"$dir/"
+    s"https://${bucketName}.s3.amazonaws.com/${d}${templates.getName}/${template}"
+  }
 
   @tailrec
   private def describeStacks(client: AmazonCloudFormationClient,
@@ -52,7 +54,8 @@ trait CloudFormationProvider {
         s == StackStatus.ROLLBACK_FAILED.toString ||
         s == StackStatus.UPDATE_COMPLETE.toString ||
         s == StackStatus.DELETE_FAILED.toString ||
-        s == StackStatus.ROLLBACK_COMPLETE.toString
+        s == StackStatus.ROLLBACK_COMPLETE.toString ||
+        s == StackStatus.UPDATE_ROLLBACK_FAILED.toString
       }
     )
     if (completed) {

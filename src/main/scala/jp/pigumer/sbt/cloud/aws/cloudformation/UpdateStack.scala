@@ -19,20 +19,18 @@ trait UpdateStack {
 
   protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
-  protected def url(bucketName: String, stage: String, templates: File, template: String): String
+  protected def url(bucketName: String, dir: String, templates: File, template: String): String
 
   protected def waitForCompletion(client: AmazonCloudFormationClient,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
   private def update(settings: AwscfSettings,
-                     stage: String,
                      stack: CloudformationStack,
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
 
-    val dir = settings.projectName.map(p ⇒ s"${p}${stage}").getOrElse(stage)
-    val u = url(settings.bucketName, dir, settings.templates, stack.template)
+    val u = url(settings.bucketName, settings.dir, settings.templates, stack.template)
     val params: Seq[Parameter] = stack.parameters.map {
       case (key, value) ⇒ {
         val p: Parameter = new Parameter().withParameterKey(key).withParameterValue(value)
@@ -64,11 +62,11 @@ trait UpdateStack {
   def updateStackTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
-    spaceDelimited("<stage> <shortName>").parsed match {
-      case Seq(stage, shortName) ⇒ {
+    spaceDelimited("<shortName>").parsed match {
+      case Seq(shortName) ⇒ {
         (for {
           stack ← Try(awscfStacks.value.get(shortName).getOrElse(sys.error(s"${shortName} of the stack is not defined")))
-          _ ← update(settings, stage, stack, log)
+          _ ← update(settings, stack, log)
           _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
@@ -78,7 +76,7 @@ trait UpdateStack {
           }
         }
       }
-      case _ ⇒ sys.error("Usage: <stage> <shortName>")
+      case _ ⇒ sys.error("Usage: <shortName>")
     }
   }
 }

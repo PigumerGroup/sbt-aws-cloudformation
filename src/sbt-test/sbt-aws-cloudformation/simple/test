@@ -6,34 +6,34 @@
 
 > awscfValidateTemplate test1.yaml
 
-> awscfUploadTemplates test
+> awscfUploadTemplates
 
-> awscfDeleteStack test test
+> awscfDeleteStack test
 
-> awscfDeleteStack test test2
+> awscfDeleteStack test2
 
-> awscfDeleteStack test dynamodb
+> awscfDeleteStack dynamodb
 
--> awscfCreateStack test fail
+-> awscfCreateStack fail
 
-> awscfCreateStack test test
+> awscfCreateStack test
 
-> awscfUpdateStack test testu
+> awscfUpdateStack testu
 
 > awscfListExports
 
 > awscfListStacks
 
-> awscfDeleteStack test test
+> awscfDeleteStack test
 
--> awscfCreateStack test fail2
+-> awscfCreateStack fail2
 
-> awscfCreateStack test test2
+> awscfCreateStack test2
 
-> awscfUpdateStack test test2u
+> awscfUpdateStack test2u
 
-> awscfDeleteStack test test2
+> awscfDeleteStack test2
 
-> awscfCreateStack test dynamodb
+> awscfCreateStack dynamodb
 
-> awscfDeleteStack test dynamodb
+> awscfDeleteStack dynamodb

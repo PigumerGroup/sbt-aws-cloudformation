@@ -20,7 +20,6 @@ trait DeleteStack {
                                   log: Logger): Try[Seq[Stack]]
 
   private def delete(settings: AwscfSettings,
-                     stage: String,
                      stack: CloudformationStack,
                      log: Logger) = Try {
     val request = new DeleteStackRequest().
@@ -39,11 +38,11 @@ trait DeleteStack {
   def deleteStackTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
-    spaceDelimited("<stage> <shortName>").parsed match {
-      case Seq(stage, shortName) => {
+    spaceDelimited("<shortName>").parsed match {
+      case Seq(shortName) => {
         (for {
           stack ← Try(awscfStacks.value.get(shortName).getOrElse(sys.error(s"${shortName} of the stack is not defined")))
-          _ ← delete(settings, stage, stack, log)
+          _ ← delete(settings, stack, log)
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒ {
@@ -52,7 +51,7 @@ trait DeleteStack {
           }
         }
       }
-      case _ ⇒ sys.error("Usage: <stage> <shortName>")
+      case _ ⇒ sys.error("Usage: <shortName>")
     }
   }
 }

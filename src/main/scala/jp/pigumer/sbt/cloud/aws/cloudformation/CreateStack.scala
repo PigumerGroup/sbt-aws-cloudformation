@@ -27,13 +27,11 @@ trait CreateStack {
                                   log: Logger): Try[Seq[Stack]]
 
   private def create(settings: AwscfSettings,
-                     stage: String,
                      stack: CloudformationStack,
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
 
-    val dir = settings.projectName.map(p ⇒ s"${p}${stage}").getOrElse(stage)
-    val u = url(settings.bucketName, dir, settings.templates, stack.template)
+    val u = url(settings.bucketName, settings.dir, settings.templates, stack.template)
     val params: Seq[Parameter] = stack.parameters.map {
       case (key, value) ⇒ {
         val p: Parameter = new Parameter().withParameterKey(key).withParameterValue(value)
@@ -65,11 +63,11 @@ trait CreateStack {
   def createStackTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
-    spaceDelimited("<stage> <shortName>").parsed match {
-      case Seq(stage, shortName) ⇒ {
+    spaceDelimited("<shortName>").parsed match {
+      case Seq(shortName) ⇒ {
         (for {
           stack ← Try(awscfStacks.value.get(shortName).getOrElse(sys.error(s"${shortName} of the stack is not defined")))
-          _ ← create(settings, stage, stack, log)
+          _ ← create(settings, stack, log)
           _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
@@ -79,7 +77,7 @@ trait CreateStack {
           }
         }
       }
-      case _ ⇒ sys.error("Usage: <stage> <shortName>")
+      case _ ⇒ sys.error("Usage: <shortName>")
     }
   }
 }
