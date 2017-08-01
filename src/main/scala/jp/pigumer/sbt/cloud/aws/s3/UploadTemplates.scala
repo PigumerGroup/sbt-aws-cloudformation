@@ -50,16 +50,17 @@ trait UploadTemplates {
     }
   }
 
-  def putObjectTask = Def.task {
+  def putObjectsTask = Def.task {
     val log = streams.value.log
     val settings = awscfSettings.value
-    val putObjectRequest = awscfPutObjectRequest.value.putObjectRequest
-    Try {
-      val client = amazonS3Client(settings)
-      client.putObject(putObjectRequest)
-    } match {
-      case Success(_) ⇒ ()
-      case Failure(t) ⇒ sys.error(t.toString)
+    awscfPutObjectRequests.value.requests.foreach { request ⇒
+      Try {
+        val client = amazonS3Client(settings)
+        client.putObject(request)
+      } match {
+        case Success(_) ⇒ ()
+        case Failure(t) ⇒ sys.error(t.toString)
+      }
     }
   }
 

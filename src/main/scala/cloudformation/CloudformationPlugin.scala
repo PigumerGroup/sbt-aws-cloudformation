@@ -13,6 +13,8 @@ object CloudformationPlugin extends AutoPlugin {
     awscfSettings := awscfSettings.value,
     awscfStacks := awscfStacks.value,
 
+    awscfPutObjectRequests := awscfPutObjectRequests.?.value.getOrElse(AwscfPutObjectRequests(Seq.empty)),
+
     awscfUploadTemplates := CloudformationTasks.uploadTemplatesTask.value,
 
     awscfCreateStack := CloudformationTasks.createStackTask.evaluated,
@@ -25,6 +27,8 @@ object CloudformationPlugin extends AutoPlugin {
     awscfListExports := CloudformationTasks.listExportsTask.value,
 
     awscfUpload := CloudformationTasks.uploadTask.evaluated,
+
+    awscfPutObjects := CloudformationTasks.putObjectsTask.value,
 
     awscfCreateBucket := CloudformationTasks.createBucketTask.evaluated
   )
