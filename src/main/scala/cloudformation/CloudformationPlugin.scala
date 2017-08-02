@@ -11,7 +11,7 @@ object CloudformationPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     awscfSettings := awscfSettings.value,
-    awscfStacks := awscfStacks.value,
+    awscfStacks := awscfStacks.?.value.getOrElse(Map.empty[String, CloudformationStack]),
 
     awscfPutObjectRequests := awscfPutObjectRequests.?.value.getOrElse(AwscfPutObjectRequests(Seq.empty)),
 

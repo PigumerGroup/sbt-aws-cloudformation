@@ -6,8 +6,8 @@ import sbt._
 trait CloudformationKeys {
 
   val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
-  val awscfStacks = settingKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
 
+  val awscfStacks = taskKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
   val awscfPutObjectRequests = taskKey[AwscfPutObjectRequests]("AWS S3 put object request")
 
   val awscfUploadTemplates = taskKey[Unit]("Upload templates to AWS S3 Bucket")

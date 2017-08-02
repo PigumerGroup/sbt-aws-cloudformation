@@ -3,7 +3,7 @@ import sbt._
 
 object Dependencies {
 
-  val AwsSdkVersion = "1.11.128"
+  val AwsSdkVersion = "1.11.171"
 
   val AwsCloudformationDeps = Seq(
     libraryDependencies ++= Seq(
