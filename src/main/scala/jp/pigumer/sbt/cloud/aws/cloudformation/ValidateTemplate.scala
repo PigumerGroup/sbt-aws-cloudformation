@@ -3,7 +3,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 import java.io.File
 
 import cloudformation.AwscfSettings
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
+import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.ValidateTemplateRequest
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
@@ -16,7 +16,7 @@ trait ValidateTemplate {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   private def validateTemplate(settings: AwscfSettings,
                                templateName: String,
@@ -34,17 +34,15 @@ trait ValidateTemplate {
     val log = streams.value.log
     val settings = awscfSettings.value
     spaceDelimited("<templateName>").parsed match {
-      case Seq(templateName) ⇒ {
+      case Seq(templateName) ⇒
         (for {
           _ ← validateTemplate(settings, templateName, log)
         } yield ()) match {
           case Success(_) ⇒ ()
-          case Failure(t) ⇒ {
+          case Failure(t) ⇒
             log.trace(t)
             sys.error(t.toString)
-          }
         }
-      }
       case _ ⇒ sys.error("Usage: <templateName>")
     }
   }

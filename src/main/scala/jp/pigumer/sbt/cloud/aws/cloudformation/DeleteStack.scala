@@ -1,7 +1,7 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.{AwscfSettings, CloudformationStack}
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
+import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{DeleteStackRequest, Stack}
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
@@ -13,9 +13,9 @@ trait DeleteStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
-  protected def waitForCompletion(amazonCloudFormation: AmazonCloudFormationClient,
+  protected def waitForCompletion(amazonCloudFormation: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
@@ -28,7 +28,7 @@ trait DeleteStack {
     log.info(s"Delete ${stack.stackName}")
 
     val client = amazonCloudFormation(settings)
-    client.deleteStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
+    client.deleteStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(_) ⇒ ()
       case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
@@ -39,9 +39,9 @@ trait DeleteStack {
     val log = streams.value.log
     val settings = awscfSettings.value
     spaceDelimited("<shortName>").parsed match {
-      case Seq(shortName) => {
+      case Seq(shortName) =>
         (for {
-          stack ← Try(awscfStacks.value.get(shortName).getOrElse(sys.error(s"${shortName} of the stack is not defined")))
+          stack ← Try(awscfStacks.value.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
           _ ← delete(settings, stack, log)
         } yield ()) match {
           case Success(_) ⇒ ()
@@ -50,7 +50,6 @@ trait DeleteStack {
             sys.error(t.getMessage)
           }
         }
-      }
       case _ ⇒ sys.error("Usage: <shortName>")
     }
   }

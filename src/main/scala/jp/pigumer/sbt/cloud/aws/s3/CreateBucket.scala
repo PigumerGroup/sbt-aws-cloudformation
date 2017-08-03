@@ -2,7 +2,7 @@ package jp.pigumer.sbt.cloud.aws.s3
 
 import cloudformation.AwscfSettings
 import cloudformation.CloudformationPlugin.autoImport.awscfSettings
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
+import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack}
 import sbt.Keys.streams
 import sbt.complete.DefaultParsers.spaceDelimited
@@ -12,9 +12,9 @@ import scala.util.{Failure, Success, Try}
 
 trait CreateBucket {
 
-  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
-  protected def waitForCompletion(client: AmazonCloudFormationClient,
+  protected def waitForCompletion(client: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
@@ -46,8 +46,8 @@ trait CreateBucket {
 
     val client = amazonCloudFormation(settings)
 
-    log.info(s"Create ${stackName} ${bucketName}")
-    client.createStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
+    log.info(s"Create $stackName $bucketName")
+    client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stackName, log) match {
       case Failure(t) ⇒ throw t
       case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
@@ -58,24 +58,20 @@ trait CreateBucket {
     val log = streams.value.log
     val settings = awscfSettings.value
     spaceDelimited("<stackName> <bucketName>").parsed match {
-      case Seq(stackName, bucketName) ⇒ {
+      case Seq(stackName, bucketName) ⇒
         createStack(settings, stackName, bucketName, log) match {
           case Success(_) ⇒ ()
-          case Failure(t) ⇒ {
+          case Failure(t) ⇒
             log.trace(t)
             sys.error(t.getMessage)
-          }
         }
-      }
-      case Seq(stackName) ⇒ {
+      case Seq(stackName) ⇒
         createStack(settings, stackName, settings.bucketName, log) match {
           case Success(_) ⇒ ()
-          case Failure(t) ⇒ {
+          case Failure(t) ⇒
             log.trace(t)
             sys.error(t.getMessage)
-          }
         }
-      }
       case _ ⇒ sys.error("Usage: createBucket <stackName> <bucketName>")
     }
   }

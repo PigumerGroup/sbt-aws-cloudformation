@@ -1,9 +1,7 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import java.io.File
-
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
+import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack, StackStatus}
 import sbt.Def._
 import sbt.Keys.streams
@@ -16,13 +14,13 @@ trait CreateStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
-  protected def url(bucketName: String, stage: String, templates: File, template: String): String
+  protected def url(bucketName: String, dir: String, fileName: String): String
 
   protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
-  protected def waitForCompletion(client: AmazonCloudFormationClient,
+  protected def waitForCompletion(client: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
@@ -31,7 +29,7 @@ trait CreateStack {
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
 
-    val u = url(settings.bucketName, settings.dir, settings.templates, stack.template)
+    val u = url(settings.bucketName, settings.baseDir, stack.template)
     val params: Seq[Parameter] = stack.parameters.map {
       case (key, value) ⇒ {
         val p: Parameter = new Parameter().withParameterKey(key).withParameterValue(value)
@@ -48,7 +46,7 @@ trait CreateStack {
     val client = amazonCloudFormation(settings)
 
     log.info(s"Create ${stack.stackName}")
-    client.createStack(settings.roleARN.map(request.withRoleARN(_)).getOrElse(request))
+    client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(t) ⇒ throw t
       case Success(r) ⇒ {
@@ -64,19 +62,17 @@ trait CreateStack {
     val log = streams.value.log
     val settings = awscfSettings.value
     spaceDelimited("<shortName>").parsed match {
-      case Seq(shortName) ⇒ {
+      case Seq(shortName) ⇒
         (for {
-          stack ← Try(awscfStacks.value.get(shortName).getOrElse(sys.error(s"${shortName} of the stack is not defined")))
+          stack ← Try(awscfStacks.value.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
           _ ← create(settings, stack, log)
           _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
-          case Failure(t) ⇒ {
+          case Failure(t) ⇒
             log.trace(t)
             sys.error(t.getMessage)
-          }
         }
-      }
       case _ ⇒ sys.error("Usage: <shortName>")
     }
   }

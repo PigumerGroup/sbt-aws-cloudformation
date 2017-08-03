@@ -1,10 +1,9 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.{AwscfExport, AwscfSettings}
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient
+import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{Export, ListExportsRequest, StackSummary}
-import sbt.Keys.streams
-import sbt.{Def, Logger}
+import sbt.Def
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -14,26 +13,17 @@ trait ListExports {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient
+  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
-  private def output(export: AwscfExport, log: Logger): Unit = {
-    val s = s"${export.stackName} ${export.name} ${export.value}"
-    log.info(s)
-  }
-
-  private def listExports(settings: AwscfSettings,
-                          log: Logger) = Try {
+  private def listExports(settings: AwscfSettings): Try[Seq[AwscfExport]] = Try {
     val request = new ListExportsRequest()
     val client = amazonCloudFormation(settings)
-    val list = ListExports.listExports(client)
-    list.foreach(output(_, log))
-    list
+    ListExports.listExports(client)
   }
 
   def listExportsTask = Def.task {
-    val log = streams.value.log
     val settings = awscfSettings.value
-    listExports(settings, log) match {
+    listExports(settings) match {
       case Success(r) ⇒ r
       case Failure(t) ⇒ {
         sys.error(t.toString)
@@ -47,7 +37,7 @@ object ListExports {
   import scala.collection.JavaConverters._
 
   @tailrec
-  private def exports(client: AmazonCloudFormationClient,
+  private def exports(client: AmazonCloudFormation,
                       request: ListExportsRequest,
                       stacks: Map[String, StackSummary],
                       exportList: mutable.MutableList[AwscfExport]): Unit = {
@@ -70,7 +60,7 @@ object ListExports {
     }
   }
 
-  def listExports(client: AmazonCloudFormationClient): Seq[AwscfExport] = {
+  def listExports(client: AmazonCloudFormation): Seq[AwscfExport] = {
     val request = new ListExportsRequest()
 
     val result = mutable.MutableList[AwscfExport]()

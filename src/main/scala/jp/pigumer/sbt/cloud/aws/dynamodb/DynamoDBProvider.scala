@@ -1,18 +1,16 @@
 package jp.pigumer.sbt.cloud.aws.dynamodb
 
 import cloudformation.AwscfSettings
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDBClient, AmazonDynamoDBClientBuilder}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 
 trait DynamoDBProvider {
 
-  import cloudformation.CloudformationPlugin.autoImport._
-
-  protected lazy val amazonDynamoDB: AwscfSettings ⇒ AmazonDynamoDBClient = settings ⇒ {
-    val builder = AmazonDynamoDBClientBuilder.
+  protected lazy val amazonDynamoDB: AwscfSettings ⇒ AmazonDynamoDB = { settings ⇒
+    AmazonDynamoDBClientBuilder.
       standard().
       withCredentials(settings.credentialsProvider).
-      withRegion(settings.region)
-    builder.build().asInstanceOf[AmazonDynamoDBClient]
+      withRegion(settings.region).
+      build
   }
 
 }

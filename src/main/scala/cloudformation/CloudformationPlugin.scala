@@ -4,8 +4,7 @@ import sbt.{Def, _}
 
 object CloudformationPlugin extends AutoPlugin {
 
-  object autoImport extends CloudformationKeys {
-  }
+  object autoImport extends CloudformationKeys
 
   import autoImport._
 

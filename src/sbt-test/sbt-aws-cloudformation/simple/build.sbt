@@ -11,7 +11,7 @@ lazy val root = (project in file(".")).
     awscfSettings := AwscfSettings(
       region = "ap-northeast-1",
       bucketName = BucketName,
-      projectName = Some("example"),
+      projectName = "example",
       templates = file("cloudformation"),
       roleARN = role
     ),

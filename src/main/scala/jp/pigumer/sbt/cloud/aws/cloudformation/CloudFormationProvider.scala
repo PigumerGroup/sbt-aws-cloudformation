@@ -1,10 +1,8 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import java.io.File
-
 import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.model.{DescribeStacksRequest, Stack, StackStatus}
-import com.amazonaws.services.cloudformation.{AmazonCloudFormationClient, AmazonCloudFormationClientBuilder}
+import com.amazonaws.services.cloudformation.{AmazonCloudFormation, AmazonCloudFormationClientBuilder}
 import sbt.Logger
 
 import scala.annotation.tailrec
@@ -13,21 +11,29 @@ import scala.util.Try
 
 trait CloudFormationProvider {
 
-  lazy val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormationClient = settings ⇒ {
-    val builder = AmazonCloudFormationClientBuilder.
+  lazy val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation = { settings ⇒
+    AmazonCloudFormationClientBuilder.
       standard.
       withCredentials(settings.credentialsProvider).
-      withRegion(settings.region)
-    builder.build.asInstanceOf[AmazonCloudFormationClient]
+      withRegion(settings.region).
+      build
   }
 
-  protected def url(bucketName: String, dir: String, templates: File, template: String): String = {
-    val d = if (dir.isEmpty) "" else s"$dir/"
-    s"https://${bucketName}.s3.amazonaws.com/${d}${templates.getName}/${template}"
-  }
+  protected def key(dir: String, fileName: String): String =
+    if (dir.isEmpty) {
+      fileName
+    } else {
+      s"$dir/$fileName"
+    }
+
+  protected def url(bucketName: String, key: String): String =
+    s"https://$bucketName.s3.amazonaws.com/$key"
+
+  protected def url(bucketName: String, dir: String, fileName: String): String =
+    url(bucketName, key(dir, fileName))
 
   @tailrec
-  private def describeStacks(client: AmazonCloudFormationClient,
+  private def describeStacks(client: AmazonCloudFormation,
                      request: DescribeStacksRequest,
                      list: Stream[Stack]): Stream[Stack] = {
     val result = client.describeStacks(request)
@@ -42,7 +48,7 @@ trait CloudFormationProvider {
   }
 
   @tailrec
-  private def allCompletion(client: AmazonCloudFormationClient,
+  private def allCompletion(client: AmazonCloudFormation,
                             request: DescribeStacksRequest,
                             stacks: Stream[Stack],
                             log: Logger): Stream[Stack] = {
@@ -69,7 +75,7 @@ trait CloudFormationProvider {
     }
   }
 
-  protected def waitForCompletion(client: AmazonCloudFormationClient,
+  protected def waitForCompletion(client: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]] = {
     val request = new DescribeStacksRequest().
