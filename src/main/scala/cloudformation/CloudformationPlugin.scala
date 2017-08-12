@@ -1,5 +1,6 @@
 package cloudformation
 
+import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import sbt.{Def, _}
 
@@ -36,8 +37,11 @@ object CloudformationPlugin extends AutoPlugin {
 
     awscfCreateBucket := CloudformationTasks.createBucketTask.evaluated,
 
-    awscfECRAuthorizationTokenRequest := awscfECRAuthorizationTokenRequest.?.value.getOrElse(None),
-    awscfECRAuthorizationToken := CloudformationTasks.getECRAuthorizationToken.value,
+    awscfECRAuthorizationTokenRequest := awscfECRAuthorizationTokenRequest.?.value.getOrElse(new GetAuthorizationTokenRequest()),
+    awscfECRAuthorizationToken := {
+      import CloudformationTasks._
+      AwscfECRCredential(amazonECR(awscfSettings.value).getAuthorizationToken(awscfECRAuthorizationTokenRequest.value))
+    },
     awscfECRDomain := {
       s"${awscfAccountId.value}.dkr.ecr.${awscfSettings.value.region}.amazonaws.com"
     }

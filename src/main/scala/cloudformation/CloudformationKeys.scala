@@ -28,7 +28,7 @@ trait CloudformationKeys {
 
   val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 
-  val awscfECRAuthorizationTokenRequest = taskKey[Option[GetAuthorizationTokenRequest]]("getAuthorizationTokenRequest")
+  val awscfECRAuthorizationTokenRequest = taskKey[GetAuthorizationTokenRequest]("getAuthorizationTokenRequest")
   val awscfECRAuthorizationToken = taskKey[AwscfECRCredential]("getAuthorizationToken")
   val awscfECRDomain = taskKey[String]("Get ECR domain")
 }
