@@ -5,7 +5,7 @@ import java.util.Base64
 
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenResult
 
-class AwscfECRCredential(user: String, password: String)
+class AwscfECRCredential(val user: String, val password: String)
 
 object AwscfECRCredential {
   import scala.collection.JavaConverters._
