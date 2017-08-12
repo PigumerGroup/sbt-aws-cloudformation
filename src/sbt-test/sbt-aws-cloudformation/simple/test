@@ -1,3 +1,6 @@
+> awscfAccountId
+> awscfECRDomain
+
 -> awscfCreateBucket CreateBucketTest
 
 -> awscfValidateTemplate

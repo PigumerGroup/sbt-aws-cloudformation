@@ -1,5 +1,6 @@
 package cloudformation
 
+import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import sbt.{Def, _}
 
 object CloudformationPlugin extends AutoPlugin {
@@ -10,6 +11,10 @@ object CloudformationPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     awscfSettings := awscfSettings.value,
+    awscfAccountId := {
+      import CloudformationTasks._
+      sts(awscfSettings.value).getCallerIdentity(new GetCallerIdentityRequest()).getAccount
+    },
     awscfStacks := awscfStacks.?.value.getOrElse(Map.empty[String, CloudformationStack]),
 
     awscfPutObjectRequests := awscfPutObjectRequests.?.value.getOrElse(AwscfPutObjectRequests(Seq.empty)),
@@ -29,6 +34,12 @@ object CloudformationPlugin extends AutoPlugin {
 
     awscfPutObjects := CloudformationTasks.putObjectsTask.value,
 
-    awscfCreateBucket := CloudformationTasks.createBucketTask.evaluated
+    awscfCreateBucket := CloudformationTasks.createBucketTask.evaluated,
+
+    awscfECRAuthorizationTokenRequest := awscfECRAuthorizationTokenRequest.?.value.getOrElse(None),
+    awscfECRAuthorizationToken := CloudformationTasks.getECRAuthorizationToken.value,
+    awscfECRDomain := {
+      s"${awscfAccountId.value}.dkr.ecr.${awscfSettings.value.region}.amazonaws.com"
+    }
   )
 }

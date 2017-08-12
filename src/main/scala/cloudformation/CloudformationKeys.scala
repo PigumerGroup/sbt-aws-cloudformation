@@ -1,11 +1,13 @@
 package cloudformation
 
 import com.amazonaws.services.cloudformation.model.StackSummary
+import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest
 import sbt._
 
 trait CloudformationKeys {
 
   val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
+  val awscfAccountId = taskKey[String]("Get account id")
 
   val awscfStacks = taskKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
   val awscfPutObjectRequests = taskKey[AwscfPutObjectRequests]("AWS S3 put object request")
@@ -25,4 +27,8 @@ trait CloudformationKeys {
   val awscfPutObjects = taskKey[Unit]("Put object AWS S3 Bucket")
 
   val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
+
+  val awscfECRAuthorizationTokenRequest = taskKey[Option[GetAuthorizationTokenRequest]]("getAuthorizationTokenRequest")
+  val awscfECRAuthorizationToken = taskKey[AwscfECRCredential]("getAuthorizationToken")
+  val awscfECRDomain = taskKey[String]("Get ECR domain")
 }
