@@ -57,7 +57,7 @@ ex build.sbt::
       version := "0.1",
       scalaVersion := "2.12.3",
       awscfSettings := AwscfSettings(
-        projectName = Some("example"),
+        projectName = "example",
         region = <YOUR_REGION_NAME>,
         bucketName = <YOUR_BUCKET_NAME>,
         templates = file(<YOUR_TEMPLATES>),
