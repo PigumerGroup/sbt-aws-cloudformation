@@ -1,10 +1,10 @@
 package jp.pigumer.sbt.cloud.aws.sts
 
 import cloudformation.AwscfSettings
-import com.amazonaws.services.securitytoken.{AWSSecurityTokenService, AWSSecurityTokenServiceClientBuilder}
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 
 trait Sts {
 
-  val sts: (AwscfSettings) => AWSSecurityTokenService = settings ⇒
+  lazy val sts = (settings: AwscfSettings) ⇒
     AWSSecurityTokenServiceClientBuilder.standard.withCredentials(settings.credentialsProvider).withRegion(settings.region).build
 }
