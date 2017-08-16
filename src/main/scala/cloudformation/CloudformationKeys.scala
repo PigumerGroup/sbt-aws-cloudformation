@@ -2,6 +2,7 @@ package cloudformation
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.StackSummary
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.s3.AmazonS3
 import sbt._
 
@@ -9,6 +10,7 @@ trait CloudformationKeys {
 
   val awscf = taskKey[AmazonCloudFormation]("AWS CloudFormation tasks")
   val awss3 = taskKey[AmazonS3]("AWS S3 tasks")
+  val awsdynamodb = taskKey[AmazonDynamoDB]("AWS DynamoDB tasks")
 
   val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
   val awscfAccountId = taskKey[String]("Get account id")

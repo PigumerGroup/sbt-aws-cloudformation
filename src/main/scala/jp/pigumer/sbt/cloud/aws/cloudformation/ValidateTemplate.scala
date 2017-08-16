@@ -16,9 +16,8 @@ trait ValidateTemplate {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
-
-  private def validateTemplate(settings: AwscfSettings,
+  private def validateTemplate(client: AmazonCloudFormation,
+                               settings: AwscfSettings,
                                templateName: String,
                                log: Logger) = Try {
 
@@ -27,16 +26,17 @@ trait ValidateTemplate {
 
     val request = new ValidateTemplateRequest().
       withTemplateBody(templateBody)
-    cloudFormation(settings).validateTemplate(request)
+    client.validateTemplate(request)
   }
 
   def validateTemplateTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
+    val client = awscf.value
     spaceDelimited("<templateName>").parsed match {
       case Seq(templateName) ⇒
         (for {
-          _ ← validateTemplate(settings, templateName, log)
+          _ ← validateTemplate(client, settings, templateName, log)
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒

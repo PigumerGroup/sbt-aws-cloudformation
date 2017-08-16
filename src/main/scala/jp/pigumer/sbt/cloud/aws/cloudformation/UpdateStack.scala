@@ -3,6 +3,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{Parameter, Stack, StackStatus, UpdateStackRequest}
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
 import sbt.{Def, Logger}
@@ -13,17 +14,16 @@ trait UpdateStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
-
-  protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
-
+  def updateTimeToLive(client: AmazonDynamoDB, settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
+  
   protected def url(bucketName: String, dir: String, fileName: String): String
 
   protected def waitForCompletion(client: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
-  private def update(settings: AwscfSettings,
+  private def update(client: AmazonCloudFormation,
+                     settings: AwscfSettings,
                      stack: CloudformationStack,
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
@@ -43,7 +43,6 @@ trait UpdateStack {
 
     log.info(s"Update ${stack.stackName}")
 
-    val client = cloudFormation(settings)
     client.updateStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(t) ⇒ throw t
@@ -59,12 +58,14 @@ trait UpdateStack {
   def updateStackTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
+    val client = awscf.value
+    val dynamoDB = awsdynamodb.value
     spaceDelimited("<shortName>").parsed match {
       case Seq(shortName) ⇒
         (for {
           stack ← Try(awscfStacks.value.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
-          _ ← update(settings, stack, log)
-          _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(settings, t)))
+          _ ← update(client, settings, stack, log)
+          _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(dynamoDB, settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒

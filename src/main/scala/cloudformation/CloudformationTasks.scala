@@ -1,7 +1,7 @@
 package cloudformation
 
 import jp.pigumer.sbt.cloud.aws.cloudformation._
-import jp.pigumer.sbt.cloud.aws.dynamodb.{DynamoDBProvider, UpdateTimeToLive}
+import jp.pigumer.sbt.cloud.aws.dynamodb.DynamoDBProvider
 import jp.pigumer.sbt.cloud.aws.s3.{CreateBucket, S3Provider, UploadTemplates}
 import jp.pigumer.sbt.cloud.aws.sts.Sts
 
@@ -18,6 +18,5 @@ object CloudformationTasks
   with ListStacks
 
   with DynamoDBProvider
-  with UpdateTimeToLive
   with CreateBucket
   with Sts

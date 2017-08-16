@@ -13,13 +13,12 @@ trait DeleteStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
-
   protected def waitForCompletion(amazonCloudFormation: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
-  private def delete(settings: AwscfSettings,
+  private def delete(client: AmazonCloudFormation,
+                     settings: AwscfSettings,
                      stack: CloudformationStack,
                      log: Logger) = Try {
     val request = new DeleteStackRequest().
@@ -27,7 +26,6 @@ trait DeleteStack {
 
     log.info(s"Delete ${stack.stackName}")
 
-    val client = cloudFormation(settings)
     client.deleteStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(_) ⇒ ()
@@ -38,11 +36,12 @@ trait DeleteStack {
   def deleteStackTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
+    val client = awscf.value
     spaceDelimited("<shortName>").parsed match {
       case Seq(shortName) =>
         (for {
           stack ← Try(awscfStacks.value.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
-          _ ← delete(settings, stack, log)
+          _ ← delete(client, settings, stack, log)
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒ {

@@ -14,16 +14,15 @@ trait ListStacks {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
-
-  private def listStacks(settings: AwscfSettings): Try[Seq[StackSummary]] = Try {
-    ListStacks.listStacks(cloudFormation(settings))
+  private def listStacks(client: AmazonCloudFormation, settings: AwscfSettings): Try[Seq[StackSummary]] = Try {
+    ListStacks.listStacks(client)
   }
 
   def listStacksTask = Def.task {
     val log = streams.value.log
     val settings = awscfSettings.value
-    listStacks(settings) match {
+    val client = awscf.value
+    listStacks(client, settings) match {
       case Success(r) ⇒ r
       case Failure(t) ⇒ {
         sys.error(t.toString)

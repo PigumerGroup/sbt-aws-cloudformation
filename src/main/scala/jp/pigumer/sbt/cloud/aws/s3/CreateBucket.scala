@@ -1,7 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.s3
 
 import cloudformation.AwscfSettings
-import cloudformation.CloudformationPlugin.autoImport.awscfSettings
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack}
 import sbt.Keys.streams
@@ -12,13 +11,17 @@ import scala.util.{Failure, Success, Try}
 
 trait CreateBucket {
 
-  val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  import cloudformation.CloudformationPlugin.autoImport._
 
   protected def waitForCompletion(client: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
-  private def createStack(settings: AwscfSettings, stackName: String, bucketName: String, log: Logger): Try[Unit] = Try {
+  private def createStack(client: AmazonCloudFormation,
+                          settings: AwscfSettings,
+                          stackName: String,
+                          bucketName: String,
+                          log: Logger): Try[Unit] = Try {
     import scala.collection.JavaConverters._
 
     val yaml =
@@ -44,8 +47,6 @@ trait CreateBucket {
           withParameterKey("BucketName").
           withParameterValue(bucketName)).asJava)
 
-    val client = cloudFormation(settings)
-
     log.info(s"Create $stackName $bucketName")
     client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stackName, log) match {
@@ -57,16 +58,17 @@ trait CreateBucket {
   def createBucketTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
+    val client = awscf.value
     spaceDelimited("<stackName> <bucketName>").parsed match {
       case Seq(stackName, bucketName) ⇒
-        createStack(settings, stackName, bucketName, log) match {
+        createStack(client, settings, stackName, bucketName, log) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒
             log.trace(t)
             sys.error(t.getMessage)
         }
       case Seq(stackName) ⇒
-        createStack(settings, stackName, settings.bucketName, log) match {
+        createStack(client, settings, stackName, settings.bucketName, log) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒
             log.trace(t)

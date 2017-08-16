@@ -3,6 +3,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack, StackStatus}
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import sbt.Def._
 import sbt.Keys.streams
 import sbt._
@@ -14,17 +15,16 @@ trait CreateStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
-
   protected def url(bucketName: String, dir: String, fileName: String): String
 
-  protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
+  def updateTimeToLive(client: AmazonDynamoDB, settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
   protected def waitForCompletion(client: AmazonCloudFormation,
                                   stackName: String,
                                   log: Logger): Try[Seq[Stack]]
 
-  private def create(settings: AwscfSettings,
+  private def create(client: AmazonCloudFormation,
+                     settings: AwscfSettings,
                      stack: CloudformationStack,
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
@@ -43,8 +43,6 @@ trait CreateStack {
       withCapabilities(stack.capabilities.asJava).
       withParameters(params.asJava)
 
-    val client = cloudFormation(settings)
-
     log.info(s"Create ${stack.stackName}")
     client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
@@ -61,12 +59,14 @@ trait CreateStack {
   def createStackTask = Def.inputTask {
     val log = streams.value.log
     val settings = awscfSettings.value
+    val client = awscf.value
+    val dynamoDB = awsdynamodb.value
     spaceDelimited("<shortName>").parsed match {
       case Seq(shortName) ⇒
         (for {
           stack ← Try(awscfStacks.value.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
-          _ ← create(settings, stack, log)
-          _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(settings, t)))
+          _ ← create(client, settings, stack, log)
+          _ ← Try(stack.ttl.foreach(t ⇒ updateTimeToLive(dynamoDB, settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒
