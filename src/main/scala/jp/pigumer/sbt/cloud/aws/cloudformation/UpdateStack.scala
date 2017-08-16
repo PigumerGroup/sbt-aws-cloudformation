@@ -13,7 +13,7 @@ trait UpdateStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   protected def updateTimeToLive(settings: AwscfSettings, ttl: AwscfTTLSettings): Unit
 
@@ -43,7 +43,7 @@ trait UpdateStack {
 
     log.info(s"Update ${stack.stackName}")
 
-    val client = amazonCloudFormation(settings)
+    val client = cloudFormation(settings)
     client.updateStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(t) ⇒ throw t

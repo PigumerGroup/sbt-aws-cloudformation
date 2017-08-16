@@ -13,11 +13,11 @@ trait ListExports {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   private def listExports(settings: AwscfSettings): Try[Seq[AwscfExport]] = Try {
     val request = new ListExportsRequest()
-    val client = amazonCloudFormation(settings)
+    val client = cloudFormation(settings)
     ListExports.listExports(client)
   }
 

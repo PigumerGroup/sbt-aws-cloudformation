@@ -14,7 +14,7 @@ trait CreateStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   protected def url(bucketName: String, dir: String, fileName: String): String
 
@@ -43,7 +43,7 @@ trait CreateStack {
       withCapabilities(stack.capabilities.asJava).
       withParameters(params.asJava)
 
-    val client = amazonCloudFormation(settings)
+    val client = cloudFormation(settings)
 
     log.info(s"Create ${stack.stackName}")
     client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))

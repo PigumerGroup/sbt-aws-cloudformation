@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
 
 trait CreateBucket {
 
-  val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   protected def waitForCompletion(client: AmazonCloudFormation,
                                   stackName: String,
@@ -44,7 +44,7 @@ trait CreateBucket {
           withParameterKey("BucketName").
           withParameterValue(bucketName)).asJava)
 
-    val client = amazonCloudFormation(settings)
+    val client = cloudFormation(settings)
 
     log.info(s"Create $stackName $bucketName")
     client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))

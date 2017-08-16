@@ -2,23 +2,33 @@ package cloudformation
 
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
+import jp.pigumer.sbt.cloud.aws.ecr.Ecr
 import sbt.{Def, _}
 
 object CloudformationPlugin extends AutoPlugin {
 
-  object autoImport extends CloudformationKeys
+  object autoImport extends CloudformationKeys with EcrKeys
 
   import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     awscfSettings := awscfSettings.value,
+
+    awscf := {
+      import CloudformationTasks._
+      cloudFormation(awscfSettings.value)
+    },
+
+    awss3 := {
+      import CloudformationTasks._
+      amazonS3(awscfSettings.value)
+    },
+
     awscfAccountId := {
       import CloudformationTasks._
       sts(awscfSettings.value).getCallerIdentity(new GetCallerIdentityRequest()).getAccount
     },
     awscfStacks := awscfStacks.?.value.getOrElse(Map.empty[String, CloudformationStack]),
-
-    awscfPutObjectRequests := awscfPutObjectRequests.?.value.getOrElse(AwscfPutObjectRequests(Seq.empty)),
 
     awscfUploadTemplates := CloudformationTasks.uploadTemplatesTask.value,
 
@@ -31,19 +41,26 @@ object CloudformationPlugin extends AutoPlugin {
     awscfListStacks := CloudformationTasks.listStacksTask.value,
     awscfListExports := CloudformationTasks.listExportsTask.value,
 
-    awscfUpload := CloudformationTasks.uploadTask.evaluated,
-
-    awscfPutObjects := CloudformationTasks.putObjectsTask.value,
-
     awscfCreateBucket := CloudformationTasks.createBucketTask.evaluated,
 
-    awscfECRAuthorizationTokenRequest := awscfECRAuthorizationTokenRequest.?.value.getOrElse(new GetAuthorizationTokenRequest()),
-    awscfECRAuthorizationToken := {
-      import CloudformationTasks._
-      AwscfECRCredential(amazonECR(awscfSettings.value).getAuthorizationToken(awscfECRAuthorizationTokenRequest.value))
+
+    awss3Upload in awss3 := CloudformationTasks.uploadTask.evaluated,
+
+    awss3PutObjectRequests in awss3 := awss3PutObjectRequests.?.value.getOrElse(AwscfPutObjectRequests(Seq.empty)),
+    awss3PutObjects in awss3 := CloudformationTasks.putObjectsTask.value,
+
+    
+    awsecr := {
+      new Ecr {}.ecr(awscfSettings.value)
     },
-    awscfECRDomain := {
+    awsecrGetAuthorizationTokenRequest in awsecr :=
+      awsecrGetAuthorizationTokenRequest.?.value.getOrElse(new GetAuthorizationTokenRequest()),
+    awsecrCredential in awsecr :=
+      AwscfECRCredential(awsecr.value.getAuthorizationToken((awsecrGetAuthorizationTokenRequest in awsecr).value))
+    ,
+    awsecrDomain in awsecr := {
       s"${awscfAccountId.value}.dkr.ecr.${awscfSettings.value.region}.amazonaws.com"
     }
+
   )
 }

@@ -11,13 +11,12 @@ import scala.util.Try
 
 trait CloudFormationProvider {
 
-  lazy val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation = { settings ⇒
+  lazy val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation = settings ⇒
     AmazonCloudFormationClientBuilder.
       standard.
       withCredentials(settings.credentialsProvider).
       withRegion(settings.region).
       build
-  }
 
   protected def key(dir: String, fileName: String): String =
     if (dir.isEmpty) {

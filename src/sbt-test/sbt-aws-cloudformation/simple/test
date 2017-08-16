@@ -1,5 +1,5 @@
 > awscfAccountId
-> awscfECRDomain
+> awsecr::awsecrDomain
 
 -> awscfCreateBucket CreateBucketTest
 

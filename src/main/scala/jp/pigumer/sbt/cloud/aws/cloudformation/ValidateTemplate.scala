@@ -16,7 +16,7 @@ trait ValidateTemplate {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   private def validateTemplate(settings: AwscfSettings,
                                templateName: String,
@@ -27,7 +27,7 @@ trait ValidateTemplate {
 
     val request = new ValidateTemplateRequest().
       withTemplateBody(templateBody)
-    amazonCloudFormation(settings).validateTemplate(request)
+    cloudFormation(settings).validateTemplate(request)
   }
 
   def validateTemplateTask = Def.inputTask {

@@ -13,7 +13,7 @@ trait DeleteStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   protected def waitForCompletion(amazonCloudFormation: AmazonCloudFormation,
                                   stackName: String,
@@ -27,7 +27,7 @@ trait DeleteStack {
 
     log.info(s"Delete ${stack.stackName}")
 
-    val client = amazonCloudFormation(settings)
+    val client = cloudFormation(settings)
     client.deleteStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
     waitForCompletion(client, stack.stackName, log) match {
       case Failure(_) ⇒ ()

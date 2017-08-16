@@ -14,10 +14,10 @@ trait ListStacks {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected val amazonCloudFormation: AwscfSettings ⇒ AmazonCloudFormation
+  protected val cloudFormation: AwscfSettings ⇒ AmazonCloudFormation
 
   private def listStacks(settings: AwscfSettings): Try[Seq[StackSummary]] = Try {
-    ListStacks.listStacks(amazonCloudFormation(settings))
+    ListStacks.listStacks(cloudFormation(settings))
   }
 
   def listStacksTask = Def.task {
