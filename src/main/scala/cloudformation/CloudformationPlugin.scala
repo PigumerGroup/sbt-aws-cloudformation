@@ -2,12 +2,15 @@ package cloudformation
 
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
+import jp.pigumer.sbt.cloud.aws.apigateway.ApiGateway
 import jp.pigumer.sbt.cloud.aws.ecr.Ecr
+import jp.pigumer.sbt.cloud.aws.ecs.Ecs
+import jp.pigumer.sbt.cloud.aws.lambda.Lambda
 import sbt.{Def, _}
 
 object CloudformationPlugin extends AutoPlugin {
 
-  object autoImport extends CloudformationKeys with EcrKeys
+  object autoImport extends CloudformationKeys with EcrKeys with EcsKeys with LambdaKeys with ApiGatewayKeys
 
   import autoImport._
 
@@ -65,7 +68,21 @@ object CloudformationPlugin extends AutoPlugin {
     ,
     awsecrDomain in awsecr := {
       s"${awscfAccountId.value}.dkr.ecr.${awscfSettings.value.region}.amazonaws.com"
-    }
+    },
 
+
+    awsecs := {
+      new Ecs {}.ecs(awscfSettings.value)
+    },
+
+
+    awslambda := {
+      new Lambda {}.lambda(awscfSettings.value)
+    },
+
+
+    awsapigateway := {
+      new ApiGateway {}.apigateway(awscfSettings.value)
+    }
   )
 }
