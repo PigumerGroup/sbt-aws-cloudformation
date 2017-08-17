@@ -73,11 +73,11 @@ trait UploadTemplates {
   def putObjectsTask = Def.task {
     val log = streams.value.log
     val settings = awscfSettings.value
-    (awss3PutObjectRequests in awss3).value.requests.foreach { request ⇒
+    val client = awss3.value
+    (awss3PutObjectRequests in awss3).value.values.foreach { request ⇒
       Try {
-        val client = awss3.value
-        val u = url(request.getBucketName, request.getKey)
         client.putObject(request)
+        val u = url(request.getBucketName, request.getKey)
         log.info(s"putObject $u")
       } match {
         case Success(_) ⇒ ()
@@ -92,11 +92,10 @@ trait UploadTemplates {
                      dist: String,
                      key: String,
                      log: Logger) = Try {
-    val u = url(bucketName, key)
-
-    log.info(s"upload ${u}")
     val request = new PutObjectRequest(settings.bucketName, key, new File(dist))
     client.putObject(request)
+    val u = url(bucketName, key)
+    log.info(s"upload ${u}")
   }
 
   def uploadTask = Def.inputTask {

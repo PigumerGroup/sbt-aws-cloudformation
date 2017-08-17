@@ -4,6 +4,7 @@ import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.StackSummary
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import sbt._
 
 trait CloudformationKeys {
@@ -14,6 +15,7 @@ trait CloudformationKeys {
 
   val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
 
+  val awscfGetCallerIdentityRequest = taskKey[GetCallerIdentityRequest]("GetCallerIdentityRequest")
   lazy val awscfAccountId = taskKey[String]("Get account id")
 
   val awscfStacks = taskKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
@@ -34,5 +36,5 @@ trait CloudformationKeys {
 
   val awss3Upload = inputKey[Unit]("Upload AWS S3 Bucket")
   val awss3PutObjects = taskKey[Unit]("Put object AWS S3 Bucket")
-  val awss3PutObjectRequests = taskKey[AwscfPutObjectRequests]("AWS S3 put object request")
+  val awss3PutObjectRequests = taskKey[Awss3PutObjectRequests]("AWS S3 put object request")
 }

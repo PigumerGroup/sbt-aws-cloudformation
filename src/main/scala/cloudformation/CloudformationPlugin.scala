@@ -32,10 +32,13 @@ object CloudformationPlugin extends AutoPlugin {
       dynamoDB(awscfSettings.value)
     },
 
+    awscfGetCallerIdentityRequest :=
+      awscfGetCallerIdentityRequest.?.value.getOrElse(new GetCallerIdentityRequest()),
     awscfAccountId := {
       import CloudformationTasks._
-      sts(awscfSettings.value).getCallerIdentity(new GetCallerIdentityRequest()).getAccount
+      sts(awscfSettings.value).getCallerIdentity(awscfGetCallerIdentityRequest.value).getAccount
     },
+
     awscfStacks := awscfStacks.?.value.getOrElse(Map.empty[String, CloudformationStack]),
 
     awscfUploadTemplates := CloudformationTasks.uploadTemplatesTask.value,
@@ -54,7 +57,7 @@ object CloudformationPlugin extends AutoPlugin {
 
     awss3Upload in awss3 := CloudformationTasks.uploadTask.evaluated,
 
-    awss3PutObjectRequests in awss3 := awss3PutObjectRequests.?.value.getOrElse(AwscfPutObjectRequests(Seq.empty)),
+    awss3PutObjectRequests in awss3 := awss3PutObjectRequests.?.value.getOrElse(Awss3PutObjectRequests(Seq.empty)),
     awss3PutObjects in awss3 := CloudformationTasks.putObjectsTask.value,
 
     
@@ -64,7 +67,7 @@ object CloudformationPlugin extends AutoPlugin {
     awsecrGetAuthorizationTokenRequest in awsecr :=
       awsecrGetAuthorizationTokenRequest.?.value.getOrElse(new GetAuthorizationTokenRequest()),
     awsecrCredential in awsecr :=
-      AwscfECRCredential(awsecr.value.getAuthorizationToken((awsecrGetAuthorizationTokenRequest in awsecr).value))
+      AwsecrCredential(awsecr.value.getAuthorizationToken((awsecrGetAuthorizationTokenRequest in awsecr).value))
     ,
     awsecrDomain in awsecr := {
       s"${awscfAccountId.value}.dkr.ecr.${awscfSettings.value.region}.amazonaws.com"
