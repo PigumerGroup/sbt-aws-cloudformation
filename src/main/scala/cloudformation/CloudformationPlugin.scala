@@ -3,6 +3,7 @@ package cloudformation
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import jp.pigumer.sbt.cloud.aws.apigateway.ApiGateway
+import jp.pigumer.sbt.cloud.aws.applicationautoscaling.ApplicationAutoScaling
 import jp.pigumer.sbt.cloud.aws.ecr.Ecr
 import jp.pigumer.sbt.cloud.aws.ecs.Ecs
 import jp.pigumer.sbt.cloud.aws.lambda.Lambda
@@ -10,7 +11,7 @@ import sbt.{Def, _}
 
 object CloudformationPlugin extends AutoPlugin {
 
-  object autoImport extends CloudformationKeys with EcrKeys with EcsKeys with LambdaKeys with ApiGatewayKeys
+  object autoImport extends CloudformationKeys with EcrKeys with EcsKeys with LambdaKeys with ApiGatewayKeys with ApplicationAutoScalingKeys
 
   import autoImport._
 
@@ -86,6 +87,10 @@ object CloudformationPlugin extends AutoPlugin {
 
     awsapigateway := {
       new ApiGateway {}.apigateway(awscfSettings.value)
+    },
+
+    awsApplicationAutoScaling := {
+      ApplicationAutoScaling.applicationAutoScaling(awscfSettings.value)
     }
   )
 }
