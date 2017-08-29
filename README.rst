@@ -68,6 +68,7 @@ ex build.sbt::
         template = <YOUR_TEMPLATE>,
         parameters = Map(<KEY> → <VALUE>),
         capabilities = Seq("CAPABILITY_NAMED_IAM")),
+        notificationARNs = Seq(),
         ttl = Seq(AwscfTTLSettings(
           tableName = <DYNAMODB TABLE NAME>,
           attributeName = <TTL ATTRIBUTE NAME>,
