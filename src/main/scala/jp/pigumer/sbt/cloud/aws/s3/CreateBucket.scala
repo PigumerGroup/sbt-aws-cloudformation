@@ -2,7 +2,8 @@ package jp.pigumer.sbt.cloud.aws.s3
 
 import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
-import com.amazonaws.services.cloudformation.model.{CreateStackRequest, Parameter, Stack}
+import com.amazonaws.services.cloudformation.model.{CreateStackRequest, DescribeStacksRequest, Parameter, Stack}
+import jp.pigumer.sbt.cloud.aws.cloudformation.CloudFormationWaiter
 import sbt.Keys.streams
 import sbt.complete.DefaultParsers.spaceDelimited
 import sbt.{Def, Logger}
@@ -13,9 +14,8 @@ trait CreateBucket {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected def waitForCompletion(client: AmazonCloudFormation,
-                                  stackName: String,
-                                  log: Logger): Try[Seq[Stack]]
+  def describeStacks(client: AmazonCloudFormation,
+                     request: DescribeStacksRequest): Stream[Stack]
 
   private def createStack(client: AmazonCloudFormation,
                           settings: AwscfSettings,
@@ -47,11 +47,15 @@ trait CreateBucket {
           withParameterKey("BucketName").
           withParameterValue(bucketName)).asJava)
 
-    log.info(s"Create $stackName $bucketName")
+    log.info(s"$stackName $bucketName")
     client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
-    waitForCompletion(client, stackName, log) match {
-      case Failure(t) ⇒ throw t
-      case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
+
+    val describeStacksRequest = new DescribeStacksRequest().withStackName(stackName)
+    new CloudFormationWaiter(client, client.waiters.stackCreateComplete).wait(describeStacksRequest)
+
+    describeStacks(client, describeStacksRequest).map { s ⇒
+      log.info(s"${s.getStackName} ${s.getStackStatus}")
+      s
     }
   }
 

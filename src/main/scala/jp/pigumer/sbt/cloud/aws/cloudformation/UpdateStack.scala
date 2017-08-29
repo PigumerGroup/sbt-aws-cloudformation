@@ -2,7 +2,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.{AwscfSettings, AwscfTTLSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
-import com.amazonaws.services.cloudformation.model.{Parameter, Stack, StackStatus, UpdateStackRequest}
+import com.amazonaws.services.cloudformation.model._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
@@ -18,9 +18,8 @@ trait UpdateStack {
   
   protected def url(bucketName: String, dir: String, fileName: String): String
 
-  protected def waitForCompletion(client: AmazonCloudFormation,
-                                  stackName: String,
-                                  log: Logger): Try[Seq[Stack]]
+  def describeStacks(client: AmazonCloudFormation,
+                     request: DescribeStacksRequest): Stream[Stack]
 
   private def update(client: AmazonCloudFormation,
                      settings: AwscfSettings,
@@ -41,17 +40,19 @@ trait UpdateStack {
       withCapabilities(stack.capabilities.asJava).
       withParameters(params.asJava)
 
-    log.info(s"Update ${stack.stackName}")
-
+    log.info(stack.stackName)
     client.updateStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
-    waitForCompletion(client, stack.stackName, log) match {
-      case Failure(t) ⇒ throw t
-      case Success(r) ⇒ {
-        r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
-        if (!r.forall(_.getStackStatus == StackStatus.UPDATE_COMPLETE.toString)) {
-          throw UpdateStackException()
-        }
-      }
+
+    val describeStacksRequest = new DescribeStacksRequest().withStackName(stack.stackName)
+    new CloudFormationWaiter(client, client.waiters.stackUpdateComplete).wait(describeStacksRequest)
+    val stacks = describeStacks(client, describeStacksRequest)
+
+    stacks.foreach(s ⇒ log.info(s"${s.getStackName} ${s.getStackStatus}"))
+
+    if (!stacks.forall(_.getStackStatus == StackStatus.UPDATE_COMPLETE.toString)) {
+      throw UpdateStackException()
+    } else {
+      stacks
     }
   }
 

@@ -33,7 +33,6 @@ trait CloudformationKeys {
 
   val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 
-
   val awss3Upload = inputKey[Unit]("Upload AWS S3 Bucket")
   val awss3PutObjects = taskKey[Unit]("Put object AWS S3 Bucket")
   val awss3PutObjectRequests = taskKey[Awss3PutObjectRequests]("AWS S3 put object request")

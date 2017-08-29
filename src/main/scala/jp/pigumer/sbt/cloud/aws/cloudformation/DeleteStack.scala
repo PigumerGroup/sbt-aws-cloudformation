@@ -2,7 +2,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.{AwscfSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
-import com.amazonaws.services.cloudformation.model.{DeleteStackRequest, Stack}
+import com.amazonaws.services.cloudformation.model.{DeleteStackRequest, DescribeStacksRequest}
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
 import sbt.{Def, Logger}
@@ -13,10 +13,6 @@ trait DeleteStack {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  protected def waitForCompletion(amazonCloudFormation: AmazonCloudFormation,
-                                  stackName: String,
-                                  log: Logger): Try[Seq[Stack]]
-
   private def delete(client: AmazonCloudFormation,
                      settings: AwscfSettings,
                      stack: CloudformationStack,
@@ -24,13 +20,12 @@ trait DeleteStack {
     val request = new DeleteStackRequest().
       withStackName(stack.stackName)
 
-    log.info(s"Delete ${stack.stackName}")
-
+    log.info(stack.stackName)
     client.deleteStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
-    waitForCompletion(client, stack.stackName, log) match {
-      case Failure(_) ⇒ ()
-      case Success(r) ⇒ r.foreach(stack ⇒ log.info(s"${stack.getStackName} ${stack.getStackStatus}"))
-    }
+
+    new CloudFormationWaiter(client, client.waiters.stackDeleteComplete).wait(
+      new DescribeStacksRequest().withStackName(stack.stackName)
+    )
   }
 
   def deleteStackTask = Def.inputTask {
