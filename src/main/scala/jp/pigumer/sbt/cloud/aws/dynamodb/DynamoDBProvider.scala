@@ -8,13 +8,12 @@ import scala.util.{Failure, Success, Try}
 
 trait DynamoDBProvider {
 
-  lazy val dynamoDB: AwscfSettings ⇒ AmazonDynamoDB = { settings ⇒
+  lazy val dynamoDB = (settings: AwscfSettings) ⇒
     AmazonDynamoDBClientBuilder.
       standard().
       withCredentials(settings.credentialsProvider).
       withRegion(settings.region).
       build
-  }
 
   def updateTimeToLive(client: AmazonDynamoDB, settings: AwscfSettings, ttl: AwscfTTLSettings): Unit = {
     val request = new UpdateTimeToLiveRequest().

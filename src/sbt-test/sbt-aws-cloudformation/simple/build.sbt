@@ -3,6 +3,8 @@ import cloudformation._
 val role = sys.env.get("ROLE_ARN")
 val BucketName = sys.env("BUCKET_NAME")
 
+val cfListExports = taskKey[Unit]("list exports")
+
 lazy val root = (project in file(".")).
   enablePlugins(CloudformationPlugin).
   settings(
@@ -53,4 +55,12 @@ lazy val root = (project in file(".")).
           enabled = true))
       )
     )
+  ).
+  settings(
+    cfListExports := {
+      val log = streams.value.log
+      awscfListExports.value.foreach { exp ⇒
+        log.info(s"${exp.stackName}/${exp.name}: ${exp.value}")
+      }
+    }
   )

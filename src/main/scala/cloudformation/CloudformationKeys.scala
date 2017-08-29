@@ -28,8 +28,8 @@ trait CloudformationKeys {
 
   val awscfValidateTemplate = inputKey[Unit]("Validate template")
 
-  val awscfListExports = taskKey[Seq[AwscfExport]]("List exports")
-  val awscfListStacks = taskKey[Seq[StackSummary]]("List stacks")
+  val awscfListExports = taskKey[Stream[AwscfExport]]("List exports")
+  val awscfListStacks = taskKey[Stream[StackSummary]]("List stacks")
 
   val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 

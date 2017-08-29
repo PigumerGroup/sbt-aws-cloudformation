@@ -4,22 +4,19 @@ import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{ListStacksRequest, StackStatus, StackSummary}
 import sbt.Def
-import sbt.Keys.streams
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 trait ListStacks {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  private def listStacks(client: AmazonCloudFormation, settings: AwscfSettings): Try[Seq[StackSummary]] = Try {
+  private def listStacks(client: AmazonCloudFormation, settings: AwscfSettings): Try[Stream[StackSummary]] = Try {
     ListStacks.listStacks(client)
   }
 
   def listStacksTask = Def.task {
-    val log = streams.value.log
     val settings = awscfSettings.value
     val client = awscf.value
     listStacks(client, settings) match {
@@ -38,26 +35,23 @@ object ListStacks {
   @tailrec
   private def stacks(client: AmazonCloudFormation,
                      request: ListStacksRequest,
-                     stackList: mutable.MutableList[StackSummary]): Unit = {
+                     stackList: Stream[StackSummary]): Stream[StackSummary] = {
     val result = client.listStacks(request)
-    val list = result.getStackSummaries.asScala
-    list.filterNot(r ⇒
+    val list = stackList ++ result.getStackSummaries.asScala.filterNot { r ⇒
       r.getStackStatus == StackStatus.DELETE_COMPLETE.toString
-    ).foreach(r ⇒ stackList += r)
+    }
     Option(result.getNextToken) match {
-      case None ⇒ ()
+      case None ⇒ list
       case Some(n) ⇒ {
         request.withNextToken(n)
-        stacks(client, request, stackList)
+        stacks(client, request, list)
       }
     }
   }
 
-  def listStacks(client: AmazonCloudFormation): Seq[StackSummary] = {
-    val result = mutable.MutableList[StackSummary]()
+  def listStacks(client: AmazonCloudFormation): Stream[StackSummary] = {
     val request = new ListStacksRequest()
-    stacks(client, request, result)
-    Seq(result: _*)
+    stacks(client, request, Stream.empty)
   }
 
 }

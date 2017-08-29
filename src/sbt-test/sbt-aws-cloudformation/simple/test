@@ -40,3 +40,5 @@
 > awscfCreateStack dynamodb
 
 > awscfDeleteStack dynamodb
+
+> cfListExports

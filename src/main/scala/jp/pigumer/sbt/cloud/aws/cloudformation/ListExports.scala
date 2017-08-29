@@ -2,26 +2,27 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import cloudformation.{AwscfExport, AwscfSettings}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
-import com.amazonaws.services.cloudformation.model.{Export, ListExportsRequest, StackSummary}
+import com.amazonaws.services.cloudformation.model.{ListExportsRequest, StackSummary}
 import sbt.Def
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 trait ListExports {
 
   import cloudformation.CloudformationPlugin.autoImport._
 
-  private def listExports(client: AmazonCloudFormation, settings: AwscfSettings): Try[Seq[AwscfExport]] = Try {
-    val request = new ListExportsRequest()
-    ListExports.listExports(client)
+  private def listExports(client: AmazonCloudFormation,
+                          settings: AwscfSettings,
+                          stacks: Stream[StackSummary]): Try[Stream[AwscfExport]] = Try {
+    ListExports.listExports(client, stacks)
   }
 
   def listExportsTask = Def.task {
     val settings = awscfSettings.value
     val client = awscf.value
-    listExports(client, settings) match {
+    val stacks = awscfListStacks.value
+    listExports(client, settings, stacks) match {
       case Success(r) ⇒ r
       case Failure(t) ⇒ {
         sys.error(t.toString)
@@ -38,33 +39,29 @@ object ListExports {
   private def exports(client: AmazonCloudFormation,
                       request: ListExportsRequest,
                       stacks: Map[String, StackSummary],
-                      exportList: mutable.MutableList[AwscfExport]): Unit = {
+                      exportList: Stream[AwscfExport]): Stream[AwscfExport] = {
     val result = client.listExports(request)
-    val list: Seq[Export] = result.getExports.asScala
-    list.foreach(r ⇒
-      exportList += AwscfExport(exportingStackId = r.getExportingStackId,
-        stackName = stacks.get(r.getExportingStackId).
-          map(_.getStackName).
-          getOrElse(throw new RuntimeException(s"${r.getExportingStackId} is unknown stack")),
-        name = r.getName,
-        value = r.getValue)
-    )
+    val list = exportList ++ result.getExports.asScala.map { e ⇒
+      AwscfExport(exportingStackId = e.getExportingStackId,
+        stackName = stacks(e.getExportingStackId).getStackName,
+        name = e.getName,
+        value = e.getValue)
+    }.toStream
+
     Option(result.getNextToken) match {
       case Some(n) ⇒ {
         request.withNextToken(n)
-        exports(client, request, stacks, exportList)
+        exports(client, request, stacks, list)
       }
-      case None ⇒ None
+      case None ⇒ list
     }
   }
 
-  def listExports(client: AmazonCloudFormation): Seq[AwscfExport] = {
+  def listExports(client: AmazonCloudFormation, stacks: Stream[StackSummary]): Stream[AwscfExport] = {
     val request = new ListExportsRequest()
 
-    val result = mutable.MutableList[AwscfExport]()
-    val stacks = ListStacks.listStacks(client).map(s ⇒ (s.getStackId, s)).toMap
-    exports(client, request, stacks, result)
-    Seq(result: _*)
+    val map = stacks.map(s ⇒ (s.getStackId, s)).toMap
+    exports(client, request, map, Stream.empty)
   }
 
 }

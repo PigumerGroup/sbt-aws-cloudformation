@@ -38,7 +38,8 @@ trait UpdateStack {
       withTemplateURL(u).
       withStackName(stack.stackName).
       withCapabilities(stack.capabilities.asJava).
-      withParameters(params.asJava)
+      withParameters(params.asJava).
+      withNotificationARNs(stack.notificationARNs.asJava)
 
     log.info(stack.stackName)
     client.updateStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
