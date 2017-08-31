@@ -3,12 +3,14 @@ sbt-aws-cloudformation
 
 A sbt plugin for AWS CloudFormation.
 
+* sbt 0.13.16+ or sbt 1.0.0+
+
 Installation
 ------------
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.4")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.5")
 
 
 your build.sbt::
