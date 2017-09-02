@@ -73,6 +73,8 @@ object CloudformationPlugin extends AutoPlugin {
     awsecr := {
       new Ecr {}.ecr(awscfSettings.value)
     },
+    awsecrDockerPath in awsecr :=
+      sys.env.get("DOCKER").filter(_.nonEmpty).getOrElse("docker"),
     awsecrGetAuthorizationTokenRequest in awsecr :=
       awsecrGetAuthorizationTokenRequest.?.value.getOrElse(new GetAuthorizationTokenRequest()),
     awsecrCredential in awsecr :=
@@ -80,6 +82,18 @@ object CloudformationPlugin extends AutoPlugin {
     ,
     awsecrDomain in awsecr := {
       s"${awscfAccountId.value}.dkr.ecr.${awscfSettings.value.region}.amazonaws.com"
+    },
+    awsecrLogin in awsecr := {
+      val dockerPath = (awsecrDockerPath in awsecr).value
+      val credential = (awsecrCredential in awsecr).value
+      val domain = (awsecrDomain in awsecr).value
+
+      val loginCommand = dockerPath :: "login" :: "-u" :: credential.user :: "-p" :: credential.password :: s"https://$domain" :: Nil
+      val cmd = loginCommand.mkString(" ")
+      sys.process.Process(cmd)! match {
+        case 0 ⇒ cmd
+        case _ ⇒ sys.error(s"Login failed. Command: $cmd")
+      }
     },
 
 
