@@ -20,34 +20,33 @@ trait UploadTemplates {
 
   protected def url(bucketName: String, dir: String, fileName: String): String
 
-  private def put(dir: String, file: File)(implicit settings: AwscfSettings,
-                    client: AmazonS3,
-                    log: Logger): Unit = {
+  private def put(dir: String, file: File, uploads: Seq[String])(implicit settings: AwscfSettings,
+                                                                 client: AmazonS3,
+                                                                 log: Logger): Seq[String] = {
     val k = key(dir, file.getName)
     if (file.isFile) {
       val u = url(settings.bucketName, dir, file.getName)
-      log.info(s"upload ${u}")
+      log.info(s"putObject $u")
       val request = new PutObjectRequest(settings.bucketName, k, file)
       client.putObject(request)
+      uploads :+ u
     } else {
-      putFiles(k, file.listFiles)
+      putFiles(k, file.listFiles, uploads)
     }
   }
 
   @tailrec
   private def putFiles(dir: String,
-                  files: Seq[File])(implicit settings: AwscfSettings,
-                                    client: AmazonS3,
-                                    log: Logger): Unit = {
+                       files: Seq[File],
+                       uploads: Seq[String])(implicit settings: AwscfSettings,
+                                             client: AmazonS3,
+                                             log: Logger): Seq[String] = {
     files match {
-      case head +: Nil ⇒ {
-        put(dir, head)
-      }
       case head +: tails ⇒ {
-        put(dir, head)
-        putFiles(dir, tails)
+        val res = uploads ++ put(dir, head, uploads)
+        putFiles(dir, tails, res)
       }
-      case _ ⇒ ()
+      case Nil ⇒ uploads
     }
   }
 
@@ -55,7 +54,7 @@ trait UploadTemplates {
     implicit val s = settings
     implicit val l = log
     implicit val s3 = client
-    put(settings.projectName, settings.templates)
+    put(settings.projectName, settings.templates, Seq.empty)
   }
 
   def uploadTemplatesTask = Def.task {
@@ -63,8 +62,9 @@ trait UploadTemplates {
     val settings = awscfSettings.value
     val client = awss3.value
     uploads(client, settings, log) match {
-      case Success(_) ⇒ ()
+      case Success(r) ⇒ r
       case Failure(t) ⇒ {
+        log.trace(t)
         sys.error(t.toString)
       }
     }
@@ -72,17 +72,27 @@ trait UploadTemplates {
 
   def putObjectsTask = Def.task {
     val log = streams.value.log
-    val settings = awscfSettings.value
     val client = awss3.value
-    (awss3PutObjectRequests in awss3).value.values.foreach { request ⇒
+
+    val requests = (awss3PutObjectRequests in awss3).value
+    val responses = requests.values.map { request ⇒
       Try {
         client.putObject(request)
         val u = url(request.getBucketName, request.getKey)
         log.info(s"putObject $u")
-      } match {
-        case Success(_) ⇒ ()
-        case Failure(t) ⇒ sys.error(t.toString)
+        u
       }
+    }.foldLeft(Try(Seq.empty[String])) { (r, url) ⇒
+      for {
+        x ← r
+        u ← url
+      } yield x :+ u
+    }
+    responses match {
+      case Success(r) ⇒ r
+      case Failure(t) ⇒
+        log.trace(t)
+        sys.error("putObject failed")
     }
   }
 
@@ -95,7 +105,8 @@ trait UploadTemplates {
     val request = new PutObjectRequest(settings.bucketName, key, new File(dist))
     client.putObject(request)
     val u = url(bucketName, key)
-    log.info(s"upload ${u}")
+    log.info(s"putObject $u")
+    u
   }
 
   def uploadTask = Def.inputTask {
@@ -104,8 +115,9 @@ trait UploadTemplates {
     val client = awss3.value
     spaceDelimited("<dist> <bucket> <key>").parsed match {
       case Seq(dist, bucket, key) ⇒ upload(client, settings, bucket, dist, key, log) match {
-        case Success(_) ⇒ ()
+        case Success(url) ⇒ url
         case Failure(t) ⇒ {
+          log.trace(t)
           sys.error(t.toString)
         }
       }

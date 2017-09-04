@@ -15,19 +15,6 @@ trait CloudFormationProvider {
       withRegion(settings.region).
       build
 
-  protected def key(dir: String, fileName: String): String =
-    if (dir.isEmpty) {
-      fileName
-    } else {
-      s"$dir/$fileName"
-    }
-
-  protected def url(bucketName: String, key: String): String =
-    s"https://$bucketName.s3.amazonaws.com/$key"
-
-  protected def url(bucketName: String, dir: String, fileName: String): String =
-    url(bucketName, key(dir, fileName))
-
   @tailrec
   private def describeStacks(client: AmazonCloudFormation,
                              request: DescribeStacksRequest,

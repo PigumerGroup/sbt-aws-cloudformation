@@ -20,7 +20,7 @@ trait CloudformationKeys {
 
   val awscfStacks = taskKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
 
-  val awscfUploadTemplates = taskKey[Unit]("Upload templates to AWS S3 Bucket")
+  val awscfUploadTemplates = taskKey[Seq[String]]("Upload templates to AWS S3 Bucket")
 
   val awscfCreateStack = inputKey[Unit]("Create stack")
   val awscfDeleteStack = inputKey[Unit]("Delete stack")
@@ -33,7 +33,7 @@ trait CloudformationKeys {
 
   val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 
-  val awss3Upload = inputKey[Unit]("Upload AWS S3 Bucket")
-  val awss3PutObjects = taskKey[Unit]("Put object AWS S3 Bucket")
+  val awss3Upload = inputKey[String]("Upload AWS S3 Bucket")
+  val awss3PutObjects = taskKey[Seq[String]]("Put object AWS S3 Bucket")
   val awss3PutObjectRequests = taskKey[Awss3PutObjectRequests]("AWS S3 put object request")
 }
