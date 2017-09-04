@@ -10,7 +10,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.7")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.8")
 
 
 your build.sbt::
@@ -76,4 +76,19 @@ ex build.sbt::
           attributeName = <TTL ATTRIBUTE NAME>,
           enabled = <TTL ENABLED>))
     )
+
+Snippets
+--------
+
+UpdateFunctionCode::
+
+    val lambdaUpdateFunctionCode = taskDef[Unit]("update lambda function code")
+
+    lambdaUpdateFunctionCode := {
+      val updateFunctionCodeRequest = new UpdateFunctionCodeRequest().
+        withFunctionName(name.value).
+        withS3Bucket(BucketName).
+        withS3Key((assemblyOutputPath in assembly).value.getName)
+      awslambda.value.updateFunctionCode(updateFunctionCodeRequest)
+    }
 
