@@ -82,7 +82,7 @@ Snippets
 
 UpdateFunctionCode::
 
-    val lambdaUpdateFunctionCode = taskDef[Unit]("update lambda function code")
+    val lambdaUpdateFunctionCode = taskKey[Unit]("update lambda function code")
 
     lambdaUpdateFunctionCode := {
       val updateFunctionCodeRequest = new UpdateFunctionCodeRequest().
@@ -92,3 +92,29 @@ UpdateFunctionCode::
       awslambda.value.updateFunctionCode(updateFunctionCodeRequest)
     }
 
+ECR
+
+ECR Login::
+
+    awsecr::awsecrLogin
+
+ECR Push::
+
+    val ecrPush = taskKey[Unit]("push")
+
+    ecrPush := {
+      val log = streams.value.log
+      val docker = (awsecrDockerPath in awsecr).value
+      val domain = (awsecrDomain in awsecr).value
+
+      val imageName = (packageName in Docker).value
+      val imageVersion = (version in Docker).value
+      val repositoryName = "YOUR-ECR-REPOSITORY"
+
+      val source = s"$imageName:$imageVersion"
+      val target = s"$domain/$repositoryName:$imageVersion"
+
+      AwsecrCommands.tag(docker, source, target)
+      AwsecrCommands.push(docker, target)
+      ()
+    }
