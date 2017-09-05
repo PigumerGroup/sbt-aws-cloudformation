@@ -103,7 +103,6 @@ ECR Push::
     val ecrPush = taskKey[Unit]("push")
 
     ecrPush := {
-      val log = streams.value.log
       val docker = (awsecrDockerPath in awsecr).value
       val domain = (awsecrDomain in awsecr).value
 
