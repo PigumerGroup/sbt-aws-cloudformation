@@ -80,6 +80,9 @@ ex build.sbt::
 Snippets
 --------
 
+AWS Lambda
+^^^^^^^^^^
+
 UpdateFunctionCode::
 
     val lambdaUpdateFunctionCode = taskKey[Unit]("update lambda function code")
@@ -93,6 +96,7 @@ UpdateFunctionCode::
     }
 
 ECR
+^^^^
 
 ECR Login::
 
