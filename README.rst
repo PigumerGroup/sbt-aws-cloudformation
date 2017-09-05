@@ -121,3 +121,33 @@ ECR Push::
       AwsecrCommands.push(docker, target)
       ()
     }
+
+ECS
+^^^^
+
+Update Service::
+
+    val ecsUpdateService = taskKey[Unit]("update service")
+
+    ecsUpdateService := {
+      val ecs = awsecs.value
+
+      val describeTaskDefinitionRequest = new DescribeTaskDefinitionRequest().
+        withTaskDefinition("YOUR TASK DEFINITION")
+      val describeTaskDefinitionResult = ecs.describeTaskDefinition(describeTaskDefinitionRequest)
+
+      val registerTaskDefinitionRequest = new RegisterTaskDefinitionRequest().
+        withFamily(describeTaskDefinitionResult.getTaskDefinition.getFamily).
+        withContainerDefinitions(describeTaskDefinitionResult.getTaskDefinition.getContainerDefinitions)
+
+      val registerTaskDefinitionResult = ecs.registerTaskDefinition(registerTaskDefinitionRequest)
+
+      val cluster = "YOUR ECS CLUSTER"
+      val service = "YOUR ECS SERVICE"
+      val updateServiceRequest = new UpdateServiceRequest().
+        withCluster(cluster).
+        withService(service).
+        withTaskDefinition(registerTaskDefinitionResult.getTaskDefinition.getTaskDefinitionArn)
+
+      ecs.updateService(updateServiceRequest)
+    }
