@@ -13,12 +13,12 @@ trait CloudformationKeys {
   lazy val awss3 = taskKey[AmazonS3]("AWS S3 tasks")
   lazy val awsdynamodb = taskKey[AmazonDynamoDB]("AWS DynamoDB tasks")
 
-  val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
+  lazy val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
 
-  val awscfGetCallerIdentityRequest = taskKey[GetCallerIdentityRequest]("GetCallerIdentityRequest")
+  lazy val awscfGetCallerIdentityRequest = taskKey[GetCallerIdentityRequest]("GetCallerIdentityRequest")
   lazy val awscfAccountId = taskKey[String]("Get account id")
 
-  val awscfStacks = taskKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
+  lazy val awscfStacks = taskKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
 
   val awscfUploadTemplates = taskKey[Seq[String]]("Upload templates to AWS S3 Bucket")
 
@@ -34,6 +34,6 @@ trait CloudformationKeys {
   val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 
   val awss3Upload = inputKey[String]("Upload AWS S3 Bucket")
-  val awss3PutObjects = taskKey[Seq[String]]("Put object AWS S3 Bucket")
+  lazy val awss3PutObjects = taskKey[Seq[String]]("Put object AWS S3 Bucket")
   val awss3PutObjectRequests = taskKey[Awss3PutObjectRequests]("AWS S3 put object request")
 }

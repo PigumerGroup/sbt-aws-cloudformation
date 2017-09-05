@@ -10,7 +10,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.8")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.9")
 
 
 your build.sbt::
