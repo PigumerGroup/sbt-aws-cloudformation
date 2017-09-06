@@ -18,13 +18,13 @@ trait DeleteStack {
                      stack: CloudformationStack,
                      log: Logger) = Try {
     val request = new DeleteStackRequest().
-      withStackName(stack.stackName)
+      withStackName(stack.stackName.value)
 
-    log.info(stack.stackName)
+    log.info(stack.stackName.value)
     client.deleteStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
 
     new CloudFormationWaiter(client, client.waiters.stackDeleteComplete).wait(
-      new DescribeStacksRequest().withStackName(stack.stackName)
+      new DescribeStacksRequest().withStackName(stack.stackName.value)
     )
   }
 
@@ -35,7 +35,7 @@ trait DeleteStack {
     spaceDelimited("<shortName>").parsed match {
       case Seq(shortName) =>
         (for {
-          stack ← Try(awscfStacks.value.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
+          stack ← Try(awscfStacks.value.values.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
           _ ← delete(client, settings, stack, log)
         } yield ()) match {
           case Success(_) ⇒ ()
