@@ -18,7 +18,7 @@ trait CloudformationKeys {
   lazy val awscfGetCallerIdentityRequest = taskKey[GetCallerIdentityRequest]("GetCallerIdentityRequest")
   lazy val awscfAccountId = taskKey[String]("Get account id")
 
-  lazy val awscfStacks = taskKey[Map[String, CloudformationStack]]("AWS CloudFormation stack settings")
+  lazy val awscfStacks = taskKey[Stacks]("AWS CloudFormation stack settings")
 
   val awscfUploadTemplates = taskKey[Seq[String]]("Upload templates to AWS S3 Bucket")
 
@@ -29,11 +29,14 @@ trait CloudformationKeys {
   val awscfValidateTemplate = inputKey[Unit]("Validate template")
 
   val awscfListExports = taskKey[Stream[AwscfExport]]("List exports")
+  val awscfGetValue = inputKey[String]("")
+
   val awscfListStacks = taskKey[Stream[StackSummary]]("List stacks")
 
   val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 
   val awss3Upload = inputKey[String]("Upload AWS S3 Bucket")
+
   lazy val awss3PutObjects = taskKey[Seq[String]]("Put object AWS S3 Bucket")
-  val awss3PutObjectRequests = taskKey[Awss3PutObjectRequests]("AWS S3 put object request")
+  lazy val awss3PutObjectRequests = taskKey[Awss3PutObjectRequests]("AWS S3 put object request")
 }

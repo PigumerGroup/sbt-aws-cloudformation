@@ -10,7 +10,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.9")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.10")
 
 
 your build.sbt::
@@ -65,16 +65,20 @@ ex build.sbt::
         templates = file(<YOUR_TEMPLATES>),
         roleARN = None
       ),
-      awscfStacks := Map(<SHORT_STACK_NAME> → CloudformationStack(
-        stackName = <STACK_NAME>,
-        template = <YOUR_TEMPLATE>,
-        parameters = Map(<KEY> → <VALUE>),
-        capabilities = Seq("CAPABILITY_NAMED_IAM")),
-        notificationARNs = Seq(),
-        ttl = Seq(AwscfTTLSettings(
-          tableName = <DYNAMODB TABLE NAME>,
-          attributeName = <TTL ATTRIBUTE NAME>,
-          enabled = <TTL ENABLED>))
+      awscfStacks := Stacks(
+        Map(<SHORT_STACK_NAME> → CloudformationStack(
+          stackName = <STACK_NAME>,
+          template = <YOUR_TEMPLATE>,
+          parameters = () ⇒ Map(<KEY> → <VALUE>),
+          capabilities = Seq("CAPABILITY_NAMED_IAM")),
+          notificationARNs = () ⇒ Seq("<NOTIFICATION_ARN>"),
+          ttl = Seq(AwscfTTLSetting(
+            tableName = <DYNAMODB TABLE NAME>,
+            attributeName = <TTL ATTRIBUTE NAME>,
+            enabled = <TTL ENABLED>)
+          )
+        )
+      )
     )
 
 Snippets
@@ -83,7 +87,7 @@ Snippets
 AWS Lambda
 ^^^^^^^^^^
 
-UpdateFunctionCode::
+updateFunctionCode::
 
     val lambdaUpdateFunctionCode = taskKey[Unit]("update lambda function code")
 
@@ -98,11 +102,11 @@ UpdateFunctionCode::
 ECR
 ^^^^
 
-ECR Login::
+login::
 
     awsecr::awsecrLogin
 
-ECR Push::
+tagging and push::
 
     val ecrPush = taskKey[Unit]("push")
 
@@ -125,15 +129,20 @@ ECR Push::
 ECS
 ^^^^
 
-Update Service::
+updateService::
 
     val ecsUpdateService = taskKey[Unit]("update service")
 
     ecsUpdateService := {
       val ecs = awsecs.value
 
+      val cluster = "YOUR ECS CLUSTER"
+
+      val taskDefinitionArn = awscfGetValue.toTask(" YOUR-TASK-DEFINITION-ARN-KEY").value
+      val service = awscfGetValue.toTask(" YOUR-SERVICE-KEY").value
+
       val describeTaskDefinitionRequest = new DescribeTaskDefinitionRequest().
-        withTaskDefinition("YOUR TASK DEFINITION")
+        withTaskDefinition(taskDefinitionArn)
       val describeTaskDefinitionResult = ecs.describeTaskDefinition(describeTaskDefinitionRequest)
 
       val registerTaskDefinitionRequest = new RegisterTaskDefinitionRequest().
@@ -142,8 +151,6 @@ Update Service::
 
       val registerTaskDefinitionResult = ecs.registerTaskDefinition(registerTaskDefinitionRequest)
 
-      val cluster = "YOUR ECS CLUSTER"
-      val service = "YOUR ECS SERVICE"
       val updateServiceRequest = new UpdateServiceRequest().
         withCluster(cluster).
         withService(service).

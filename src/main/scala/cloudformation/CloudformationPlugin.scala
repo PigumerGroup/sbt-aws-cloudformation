@@ -48,7 +48,7 @@ object CloudformationPlugin extends AutoPlugin {
       sts(awscfSettings.value).getCallerIdentity(awscfGetCallerIdentityRequest.value).getAccount
     },
 
-    awscfStacks := awscfStacks.?.value.getOrElse(Map.empty[String, CloudformationStack]),
+    awscfStacks := awscfStacks.?.value.getOrElse(Stacks.empty),
 
     awscfUploadTemplates := CloudformationTasks.uploadTemplatesTask.value,
 
@@ -60,6 +60,8 @@ object CloudformationPlugin extends AutoPlugin {
 
     awscfListStacks := CloudformationTasks.listStacksTask.value,
     awscfListExports := CloudformationTasks.listExportsTask.value,
+
+    awscfGetValue := CloudformationTasks.getValueTask.evaluated,
 
     awscfCreateBucket := CloudformationTasks.createBucketTask.evaluated,
 
