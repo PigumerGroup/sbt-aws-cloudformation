@@ -66,7 +66,7 @@ ex build.sbt::
         roleARN = None
       ),
       awscfStacks := Stacks(
-        Map(<SHORT_STACK_NAME> → CloudformationStack(
+        <SHORT_STACK_NAME> → CloudformationStack(
           stackName = <STACK_NAME>,
           template = <YOUR_TEMPLATE>,
           parameters = () ⇒ Map(<KEY> → <VALUE>),
@@ -79,7 +79,6 @@ ex build.sbt::
           )
         )
       )
-    )
 
 Snippets
 --------
