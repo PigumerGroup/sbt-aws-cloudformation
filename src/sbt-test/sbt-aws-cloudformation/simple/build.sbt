@@ -18,36 +18,36 @@ lazy val root = (project in file(".")).
       roleARN = role
     ),
     awscfStacks := Stacks(
-      "test" → CloudformationStack(
+      Alias("test") → CloudformationStack(
         stackName = "test",
         template = "test1.yaml",
         parameters = Map("CIDR" → "10.0.0.0/16")
       ),
-      "testu" → CloudformationStack(
+      Alias("testu") → CloudformationStack(
         stackName = "test",
         template = "test1u.yaml",
         parameters = Map("CIDR" → "10.0.0.0/16")
       ),
-      "fail" → CloudformationStack(
+      Alias("fail") → CloudformationStack(
         stackName = "test",
         template = "test1.yaml",
         parameters = Map("IPAddr" → "10.0.0.0/16")
       ),
-      "test2" → CloudformationStack(
+      Alias("test2") → CloudformationStack(
         stackName = "test2",
         template = "test2.yaml",
         capabilities = Seq("CAPABILITY_NAMED_IAM")
       ),
-      "test2u" → CloudformationStack(
+      Alias("test2u") → CloudformationStack(
         stackName = "test2",
         template = "test2u.yaml",
         capabilities = Seq("CAPABILITY_NAMED_IAM")
       ),
-      "fail2" → CloudformationStack(
+      Alias("fail2") → CloudformationStack(
         stackName = "test2",
         template = "test2.yaml"
       ),
-      "dynamodb" → CloudformationStack(
+      Alias("dynamodb") → CloudformationStack(
         stackName = "dynamodb",
         template = "dynamodb.yaml",
         ttl = Seq(TTLSetting(tableName = "test",

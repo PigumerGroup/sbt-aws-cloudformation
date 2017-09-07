@@ -10,7 +10,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.12")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.13")
 
 
 your build.sbt::
@@ -66,15 +66,15 @@ ex build.sbt::
         roleARN = None
       ),
       awscfStacks := Stacks(
-        <SHORT_STACK_NAME> → CloudformationStack(
-          stackName = <STACK_NAME>,
-          template = <YOUR_TEMPLATE>,
-          parameters = Map(<KEY> → <VALUE>),
+        Alias("<SHORT_STACK_NAME>") → CloudformationStack(
+          stackName = "<STACK_NAME>",
+          template = "<YOUR_TEMPLATE>",
+          parameters = Map("<KEY>" → "<VALUE>"),
           capabilities = Seq("CAPABILITY_NAMED_IAM")),
           notificationARNs = Seq("<NOTIFICATION_ARN>"),
           ttl = Seq(AwscfTTLSetting(
-            tableName = <DYNAMODB TABLE NAME>,
-            attributeName = <TTL ATTRIBUTE NAME>,
+            tableName = "<DYNAMODB TABLE NAME>",
+            attributeName = "<TTL ATTRIBUTE NAME>",
             enabled = <TTL ENABLED>)
           )
         )
