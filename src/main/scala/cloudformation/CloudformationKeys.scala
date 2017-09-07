@@ -20,22 +20,22 @@ trait CloudformationKeys {
 
   lazy val awscfStacks = taskKey[Stacks]("AWS CloudFormation stack settings")
 
-  val awscfUploadTemplates = taskKey[Seq[String]]("Upload templates to AWS S3 Bucket")
+  lazy val awscfUploadTemplates = taskKey[Seq[String]]("Upload templates to AWS S3 Bucket")
 
-  val awscfCreateStack = inputKey[Unit]("Create stack")
-  val awscfDeleteStack = inputKey[Unit]("Delete stack")
-  val awscfUpdateStack = inputKey[Unit]("Update stack")
+  lazy val awscfCreateStack = inputKey[Unit]("Create stack")
+  lazy val awscfDeleteStack = inputKey[Unit]("Delete stack")
+  lazy val awscfUpdateStack = inputKey[Unit]("Update stack")
 
-  val awscfValidateTemplate = inputKey[Unit]("Validate template")
+  lazy val awscfValidateTemplate = inputKey[Unit]("Validate template")
 
-  val awscfListExports = taskKey[Stream[AwscfExport]]("List exports")
-  val awscfGetValue = inputKey[String]("")
+  lazy val awscfListExports = taskKey[Stream[AwscfExport]]("List exports")
+  lazy val awscfGetValue = inputKey[String]("Get value")
 
-  val awscfListStacks = taskKey[Stream[StackSummary]]("List stacks")
+  lazy val awscfListStacks = taskKey[Stream[StackSummary]]("List stacks")
 
-  val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
+  lazy val awscfCreateBucket = inputKey[Unit]("Create AWS S3 Bucket")
 
-  val awss3Upload = inputKey[String]("Upload AWS S3 Bucket")
+  lazy val awss3Upload = inputKey[String]("Upload AWS S3 Bucket")
 
   lazy val awss3PutObjects = taskKey[Seq[String]]("Put object AWS S3 Bucket")
   lazy val awss3PutObjectRequests = taskKey[Awss3PutObjectRequests]("AWS S3 put object request")
