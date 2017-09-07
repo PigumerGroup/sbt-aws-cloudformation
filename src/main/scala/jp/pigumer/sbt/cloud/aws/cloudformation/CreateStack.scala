@@ -29,7 +29,7 @@ trait CreateStack {
     import scala.collection.JavaConverters._
 
     val u = url(settings.bucketName, settings.baseDir, stack.template.value)
-    val params: Seq[Parameter] = stack.parameters().values.map {
+    val params: Seq[Parameter] = stack.params.values.map {
       case (key, value) ⇒ {
         val p: Parameter = new Parameter().withParameterKey(key).withParameterValue(value)
         p
@@ -41,7 +41,7 @@ trait CreateStack {
       withStackName(stack.stackName.value).
       withCapabilities(stack.capabilities.values.map(_.value).asJava).
       withParameters(params.asJava).
-      withNotificationARNs(stack.notificationARNs().values.map(_.value).asJava)
+      withNotificationARNs(stack.notifications.values.map(_.value).asJava)
 
     log.info(stack.stackName.value)
     client.createStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))

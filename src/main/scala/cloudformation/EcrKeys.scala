@@ -8,10 +8,10 @@ trait EcrKeys {
 
   lazy val awsecr = taskKey[AmazonECR]("AWS ECR tasks")
 
-  val awsecrGetAuthorizationTokenRequest = taskKey[GetAuthorizationTokenRequest]("getAuthorizationTokenRequest")
-  val awsecrCredential = taskKey[AwsecrCredential]("getAuthorizationToken")
-  val awsecrDomain = taskKey[String]("Get ECR domain")
+  lazy val awsecrGetAuthorizationTokenRequest = taskKey[GetAuthorizationTokenRequest]("getAuthorizationTokenRequest")
+  lazy val awsecrCredential = taskKey[AwsecrCredential]("getAuthorizationToken")
+  lazy val awsecrDomain = taskKey[String]("Get ECR domain")
 
-  val awsecrDockerPath = taskKey[String]("Path to the Docker binary.")
-  val awsecrLogin = taskKey[String]("AWS ECR Login")
+  lazy val awsecrDockerPath = taskKey[String]("Path to the Docker binary.")
+  lazy val awsecrLogin = taskKey[String]("AWS ECR Login")
 }

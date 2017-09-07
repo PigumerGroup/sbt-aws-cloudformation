@@ -1,8 +1,13 @@
 package cloudformation
 
-case class Parameters(values: Map[String, String])
+abstract class Parameters {
+  def values: Map[String, String]
+}
 
 object Parameters {
 
-  val empty: Parameters = Parameters(Map.empty[String, String])
+  def apply(elems: Map[String, String]): Parameters =
+    new Parameters {
+      override def values: Map[String, String] = elems
+    }
 }

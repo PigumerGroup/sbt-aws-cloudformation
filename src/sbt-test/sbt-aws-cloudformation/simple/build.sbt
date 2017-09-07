@@ -21,17 +21,17 @@ lazy val root = (project in file(".")).
       "test" → CloudformationStack(
         stackName = "test",
         template = "test1.yaml",
-        parameters = () ⇒ Map("CIDR" → "10.0.0.0/16")
+        parameters = Map("CIDR" → "10.0.0.0/16")
       ),
       "testu" → CloudformationStack(
         stackName = "test",
         template = "test1u.yaml",
-        parameters = () ⇒ Map("CIDR" → "10.0.0.0/16")
+        parameters = Map("CIDR" → "10.0.0.0/16")
       ),
       "fail" → CloudformationStack(
         stackName = "test",
         template = "test1.yaml",
-        parameters = () ⇒ Map("IPAddr" → "10.0.0.0/16")
+        parameters = Map("IPAddr" → "10.0.0.0/16")
       ),
       "test2" → CloudformationStack(
         stackName = "test2",

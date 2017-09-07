@@ -2,12 +2,14 @@ package cloudformation
 
 case class NotificationARN(value: String)
 
-class NotificationARNs(val values: Seq[NotificationARN])
+abstract class NotificationARNs {
+  def values: Seq[NotificationARN]
+}
 
 object NotificationARNs {
 
-  val empty: NotificationARNs = new NotificationARNs(Seq.empty[NotificationARN])
-
-  def apply(values: Seq[String]): NotificationARNs =
-    new NotificationARNs(values.map(NotificationARN))
+  def apply(elems: Seq[String]): NotificationARNs =
+    new NotificationARNs {
+      override def values = elems.map(NotificationARN)
+    }
 }
