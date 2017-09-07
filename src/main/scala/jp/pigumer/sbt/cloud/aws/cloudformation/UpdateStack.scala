@@ -66,8 +66,8 @@ trait UpdateStack {
       case Seq(shortName) ⇒
         (for {
           stack ← Try(awscfStacks.value.values.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
-          _ ← update(client, settings, stack, log)
-          _ ← Try(stack.ttl.values.foreach(t ⇒ updateTimeToLive(dynamoDB, settings, t)))
+          _ ← update(client, settings, stack(), log)
+          _ ← Try(stack().ttl.values.foreach(t ⇒ updateTimeToLive(dynamoDB, settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒

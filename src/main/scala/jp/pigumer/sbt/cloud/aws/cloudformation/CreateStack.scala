@@ -61,11 +61,11 @@ trait CreateStack {
       case Seq(shortName) ⇒
         (for {
           stack ← Try(awscfStacks.value.values.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
-          stacks ← create(client, settings, stack, log)
+          stacks ← create(client, settings, stack(), log)
           _ ← Try {
             stacks.foreach(s ⇒ log.info(s"${s.getStackName} ${s.getStackStatus}"))
           }
-          _ ← Try(stack.ttl.values.foreach(t ⇒ updateTimeToLive(dynamoDB, settings, t)))
+          _ ← Try(stack().ttl.values.foreach(t ⇒ updateTimeToLive(dynamoDB, settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒

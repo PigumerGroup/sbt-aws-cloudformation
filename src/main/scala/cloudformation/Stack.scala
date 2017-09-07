@@ -26,11 +26,11 @@ object CloudformationStack {
     }
 }
 
-case class Stacks(values: Map[String, CloudformationStack])
+case class Stacks(values: Map[String, () ⇒ CloudformationStack])
 
 object Stacks {
 
-  val empty: Stacks = Stacks(Map.empty[String, CloudformationStack])
+  val empty: Stacks = new Stacks(Map.empty)
 
-  def apply(elems: (String, CloudformationStack)*): Stacks = new Stacks(elems.toMap)
+  def apply(elems: (String, () ⇒ CloudformationStack)*): Stacks = new Stacks(elems.toMap)
 }

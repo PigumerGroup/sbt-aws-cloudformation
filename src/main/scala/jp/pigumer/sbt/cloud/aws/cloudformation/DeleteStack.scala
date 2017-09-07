@@ -36,7 +36,7 @@ trait DeleteStack {
       case Seq(shortName) =>
         (for {
           stack ← Try(awscfStacks.value.values.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
-          _ ← delete(client, settings, stack, log)
+          _ ← delete(client, settings, stack(), log)
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒ {
