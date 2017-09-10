@@ -9,6 +9,7 @@ import jp.pigumer.sbt.cloud.aws.ecr.Ecr
 import jp.pigumer.sbt.cloud.aws.ecs.Ecs
 import jp.pigumer.sbt.cloud.aws.lambda.Lambda
 import sbt.{Def, _}
+import serverless.{Serverless, ServerlessKeys}
 
 object CloudformationPlugin extends AutoPlugin {
 
@@ -20,6 +21,7 @@ object CloudformationPlugin extends AutoPlugin {
       with ApiGatewayKeys
       with ApplicationAutoScalingKeys
       with AutoScalingKeys
+      with ServerlessKeys
 
   import autoImport._
 
@@ -119,6 +121,14 @@ object CloudformationPlugin extends AutoPlugin {
 
     awsAutoScaling := {
       AutoScaling.autoScaling(awscfSettings.value)
-    }
+    },
+
+
+    serverlessPath := serverlessPath.?.value.getOrElse("serverless"),
+    serverlessWorkingDirectory := serverlessWorkingDirectory.?.value.getOrElse(file(".")),
+
+    serverless := serverlessPath.value,
+
+    serverlessExec in serverless := Serverless.serverlessExec.evaluated
   )
 }

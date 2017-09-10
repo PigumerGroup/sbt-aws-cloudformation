@@ -6,6 +6,7 @@ import jp.pigumer.sbt.cloud.aws.s3.{CreateBucket, S3Provider, UploadTemplates}
 import jp.pigumer.sbt.cloud.aws.sts.Sts
 import sbt.Def
 import sbt.complete.DefaultParsers.spaceDelimited
+import serverless.Serverless
 
 object CloudformationTasks
   extends S3Provider
