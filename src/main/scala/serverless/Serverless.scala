@@ -10,10 +10,11 @@ object Serverless {
   def serverlessExec = Def.inputTask {
     val logger = streams.value.log
     val workingDirectory = serverlessWorkingDirectory.value
+    val environment = serverlessEnvironment.value.env()
     val cmdline = serverless.value +: spaceDelimited("<args>").parsed
     val cmd = cmdline.mkString(" ")
     logger.info(cmd)
-    sys.process.Process(cmd, workingDirectory)! match {
+    sys.process.Process(command = cmd, cwd = workingDirectory, extraEnv = environment.toArray: _*)! match {
       case 0 ⇒ ()
       case _ ⇒ sys.error(s"Command failed: $cmd")
     }

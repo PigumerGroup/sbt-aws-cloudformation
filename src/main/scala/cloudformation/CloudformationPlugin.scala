@@ -9,7 +9,7 @@ import jp.pigumer.sbt.cloud.aws.ecr.Ecr
 import jp.pigumer.sbt.cloud.aws.ecs.Ecs
 import jp.pigumer.sbt.cloud.aws.lambda.Lambda
 import sbt.{Def, _}
-import serverless.{Serverless, ServerlessKeys}
+import serverless.{Environment, Serverless, ServerlessKeys}
 
 object CloudformationPlugin extends AutoPlugin {
 
@@ -126,6 +126,9 @@ object CloudformationPlugin extends AutoPlugin {
 
     serverlessPath := serverlessPath.?.value.getOrElse("serverless"),
     serverlessWorkingDirectory := serverlessWorkingDirectory.?.value.getOrElse(file(".")),
+    serverlessEnvironment := serverlessEnvironment.?.value.getOrElse(Environment {
+      sys.env
+    }),
 
     serverless := serverlessPath.value,
 
