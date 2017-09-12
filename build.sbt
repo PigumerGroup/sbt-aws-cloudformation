@@ -2,7 +2,7 @@ lazy val root = (project in file(".")).
   settings(
     organization := "com.pigumer.sbt.cloud",
     name := "sbt-aws-cloudformation",
-    version := "5.0.13",
+    version := "5.0.14-SNAPSHOT",
     sbtPlugin := true,
     scalaCompilerBridgeSource := {
       val sv = appConfiguration.value.provider.id.version
