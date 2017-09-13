@@ -1,4 +1,4 @@
-package serverless
+package jp.pigumer.sbt.cloud.serverless
 
 class Environment(val env: () ⇒ Map[String, String])
 

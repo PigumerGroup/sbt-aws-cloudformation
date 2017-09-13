@@ -1,3 +1,5 @@
+package jp.pigumer.sbt.cloud.aws
+
 package object cloudformation {
 
   case class Alias(val name: String) {

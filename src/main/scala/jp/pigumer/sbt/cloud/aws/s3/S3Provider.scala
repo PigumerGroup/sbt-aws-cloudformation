@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.s3
 
-import cloudformation.AwscfSettings
+import jp.pigumer.sbt.cloud.aws.cloudformation.AwscfSettings
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 
 trait S3Provider {

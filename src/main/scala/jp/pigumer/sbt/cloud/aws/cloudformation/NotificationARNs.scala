@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.cloudformation
 
 case class NotificationARN(value: String)
 

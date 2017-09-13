@@ -1,6 +1,5 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.{AwscfExport, AwscfSettings}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{ListExportsRequest, StackSummary}
 import sbt.Def
@@ -10,7 +9,7 @@ import scala.util.{Failure, Success, Try}
 
 trait ListExports {
 
-  import cloudformation.CloudformationPlugin.autoImport._
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   private def listExports(client: AmazonCloudFormation,
                           settings: AwscfSettings,

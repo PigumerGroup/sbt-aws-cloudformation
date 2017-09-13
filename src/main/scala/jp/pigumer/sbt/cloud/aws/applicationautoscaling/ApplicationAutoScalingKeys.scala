@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.applicationautoscaling
 
 import com.amazonaws.services.applicationautoscaling.AWSApplicationAutoScaling
 import sbt._

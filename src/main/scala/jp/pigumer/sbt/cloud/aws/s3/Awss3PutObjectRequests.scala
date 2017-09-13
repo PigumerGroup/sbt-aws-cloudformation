@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.s3
 
 import com.amazonaws.services.s3.model.PutObjectRequest
 

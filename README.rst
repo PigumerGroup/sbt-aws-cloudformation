@@ -10,7 +10,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.14")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.15")
 
 
 your build.sbt::
@@ -51,7 +51,7 @@ Validate a AWS CloudFormation template.
 
 ex build.sbt::
 
-  import cloudformation._
+  import jp.pigumer.sbt.cloud.aws.cloudformation._
 
   lazy val root = (project in file(".")).
     enablePlugins(CloudformationPlugin).

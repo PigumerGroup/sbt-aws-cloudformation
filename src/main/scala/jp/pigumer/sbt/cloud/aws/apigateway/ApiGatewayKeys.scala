@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.apigateway
 
 import com.amazonaws.services.apigateway.AmazonApiGateway
 import sbt._

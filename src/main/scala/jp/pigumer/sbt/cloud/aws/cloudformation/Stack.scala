@@ -1,4 +1,6 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.cloudformation
+
+import jp.pigumer.sbt.cloud.aws.dynamodb.{TTLSetting, TTLSettings}
 
 abstract class CloudformationStack(val stackName: StackName,
                           val template: Template,

@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.lambda
 
-import cloudformation.AwscfSettings
+import jp.pigumer.sbt.cloud.aws.cloudformation.AwscfSettings
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder
 
 trait Lambda {

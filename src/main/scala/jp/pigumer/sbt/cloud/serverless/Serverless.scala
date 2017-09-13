@@ -1,11 +1,11 @@
-package serverless
+package jp.pigumer.sbt.cloud.serverless
 
 import sbt.complete.DefaultParsers.spaceDelimited
 import sbt._
 import sbt.Keys._
 
 object Serverless {
-  import cloudformation.CloudformationPlugin.autoImport._
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   def serverlessExec = Def.inputTask {
     val logger = streams.value.log

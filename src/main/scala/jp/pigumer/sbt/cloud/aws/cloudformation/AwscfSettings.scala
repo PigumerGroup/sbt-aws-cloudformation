@@ -1,18 +1,18 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import sbt.File
 
 import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsProviderChain}
 
 case class AwscfSettings(region: String = "us-east-1",
-                         bucketName: String,
+                         bucketName: Option[String] = None,
                          projectName: String = "",
-                         templates: File,
+                         templates: Option[File] = None,
                          credentialsProvider: AWSCredentialsProviderChain = new DefaultAWSCredentialsProviderChain(),
                          roleARN: Option[String] = None) {
   val baseDir = if (projectName.isEmpty) {
-    templates.getName
+    templates.map(_.getName())
   } else {
-    s"$projectName/${templates.getName}"
+    templates.map(f ⇒ Some(s"$projectName/${f.getName}")).getOrElse(Some(projectName))
   }
 }

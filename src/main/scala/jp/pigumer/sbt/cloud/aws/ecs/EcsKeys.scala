@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.ecs
 
 import com.amazonaws.services.ecs.AmazonECS
 import sbt._

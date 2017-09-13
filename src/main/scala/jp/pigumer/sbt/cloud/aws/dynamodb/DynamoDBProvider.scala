@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.dynamodb
 
-import cloudformation.{AwscfSettings, TTLSetting}
+import jp.pigumer.sbt.cloud.aws.cloudformation.AwscfSettings
 import com.amazonaws.services.dynamodbv2.model.UpdateTimeToLiveRequest
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 

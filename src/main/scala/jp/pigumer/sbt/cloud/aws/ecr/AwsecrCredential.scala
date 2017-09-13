@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.ecr
 
 import java.nio.charset.StandardCharsets
 import java.util.Base64

@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.sts
 
-import cloudformation.AwscfSettings
+import jp.pigumer.sbt.cloud.aws.cloudformation.AwscfSettings
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 
 trait Sts {

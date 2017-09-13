@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.dynamodb
 
 import com.amazonaws.services.dynamodbv2.model.TimeToLiveSpecification
 

@@ -1,15 +1,16 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
-import jp.pigumer.sbt.cloud.aws.apigateway.ApiGateway
-import jp.pigumer.sbt.cloud.aws.applicationautoscaling.ApplicationAutoScaling
-import jp.pigumer.sbt.cloud.aws.autoscaling.AutoScaling
-import jp.pigumer.sbt.cloud.aws.ecr.Ecr
-import jp.pigumer.sbt.cloud.aws.ecs.Ecs
-import jp.pigumer.sbt.cloud.aws.lambda.Lambda
+import jp.pigumer.sbt.cloud.aws.apigateway.{ApiGateway, ApiGatewayKeys}
+import jp.pigumer.sbt.cloud.aws.applicationautoscaling.{ApplicationAutoScaling, ApplicationAutoScalingKeys}
+import jp.pigumer.sbt.cloud.aws.autoscaling.{AutoScaling, AutoScalingKeys}
+import jp.pigumer.sbt.cloud.aws.ecr.{AwsecrCredential, Ecr, EcrKeys}
+import jp.pigumer.sbt.cloud.aws.ecs.{Ecs, EcsKeys}
+import jp.pigumer.sbt.cloud.aws.lambda.{Lambda, LambdaKeys}
+import jp.pigumer.sbt.cloud.aws.s3.Awss3PutObjectRequests
+import jp.pigumer.sbt.cloud.serverless.{Environment, Serverless, ServerlessKeys}
 import sbt.{Def, _}
-import serverless.{Environment, Serverless, ServerlessKeys}
 
 object CloudformationPlugin extends AutoPlugin {
 
@@ -124,7 +125,7 @@ object CloudformationPlugin extends AutoPlugin {
     },
 
 
-    serverlessPath := serverlessPath.?.value.getOrElse("serverless"),
+    serverlessPath := serverlessPath.?.value.getOrElse("jp/pigumer/sbt/cloud/serverless"),
     serverlessWorkingDirectory := serverlessWorkingDirectory.?.value.getOrElse(file(".")),
     serverlessEnvironment := serverlessEnvironment.?.value.getOrElse(Environment {
       sys.env

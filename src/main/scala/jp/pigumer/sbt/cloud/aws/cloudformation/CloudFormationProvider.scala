@@ -1,6 +1,5 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.model.{DescribeStacksRequest, Stack}
 import com.amazonaws.services.cloudformation.{AmazonCloudFormation, AmazonCloudFormationClientBuilder}
 

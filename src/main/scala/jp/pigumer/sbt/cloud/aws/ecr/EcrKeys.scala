@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.ecr
 
 import com.amazonaws.services.ecr.AmazonECR
 import com.amazonaws.services.ecr.model.GetAuthorizationTokenRequest

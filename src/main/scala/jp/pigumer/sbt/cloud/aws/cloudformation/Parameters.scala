@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.cloudformation
 
 abstract class Parameters {
   def values: Map[String, String]

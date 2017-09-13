@@ -1,7 +1,8 @@
-import cloudformation._
+import jp.pigumer.sbt.cloud.aws.cloudformation._
+import jp.pigumer.sbt.cloud.aws.dynamodb._
 
 val role = sys.env.get("ROLE_ARN")
-val BucketName = sys.env("BUCKET_NAME")
+val BucketName = sys.env.get("BUCKET_NAME")
 
 val cfListExports = taskKey[Unit]("list exports")
 
@@ -14,7 +15,7 @@ lazy val root = (project in file(".")).
       region = "ap-northeast-1",
       bucketName = BucketName,
       projectName = "example",
-      templates = file("cloudformation"),
+      templates = Some(file("cloudformation")),
       roleARN = role
     ),
     awscfStacks := Stacks(

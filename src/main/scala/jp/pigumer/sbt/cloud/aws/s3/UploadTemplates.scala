@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.s3
 
-import cloudformation.AwscfSettings
+import jp.pigumer.sbt.cloud.aws.cloudformation.AwscfSettings
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectRequest
 import sbt.Keys._
@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
 
 trait UploadTemplates {
 
-  import cloudformation.CloudformationPlugin.autoImport._
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   protected def key(dir: String, fileName: String): String
 
@@ -23,11 +23,12 @@ trait UploadTemplates {
   private def put(dir: String, file: File, uploads: Seq[String])(implicit settings: AwscfSettings,
                                                                  client: AmazonS3,
                                                                  log: Logger): Seq[String] = {
+    val bucketName = settings.bucketName.get
     val k = key(dir, file.getName)
     if (file.isFile) {
-      val u = url(settings.bucketName, dir, file.getName)
+      val u = url(bucketName, dir, file.getName)
       log.info(s"putObject $u")
-      val request = new PutObjectRequest(settings.bucketName, k, file)
+      val request = new PutObjectRequest(bucketName, k, file)
       client.putObject(request)
       uploads :+ u
     } else {
@@ -54,7 +55,7 @@ trait UploadTemplates {
     implicit val s = settings
     implicit val l = log
     implicit val s3 = client
-    put(settings.projectName, settings.templates, Seq.empty)
+    put(settings.projectName, settings.templates.get, Seq.empty)
   }
 
   def uploadTemplatesTask = Def.task {
@@ -102,7 +103,7 @@ trait UploadTemplates {
                      dist: String,
                      key: String,
                      log: Logger) = Try {
-    val request = new PutObjectRequest(settings.bucketName, key, new File(dist))
+    val request = new PutObjectRequest(bucketName, key, new File(dist))
     client.putObject(request)
     val u = url(bucketName, key)
     log.info(s"putObject $u")

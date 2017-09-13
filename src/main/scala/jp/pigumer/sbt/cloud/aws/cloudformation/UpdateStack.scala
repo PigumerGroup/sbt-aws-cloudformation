@@ -1,9 +1,9 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.{AwscfSettings, CloudformationStack, TTLSetting}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model._
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import jp.pigumer.sbt.cloud.aws.dynamodb.TTLSetting
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
 import sbt.{Def, Logger}
@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
 
 trait UpdateStack {
 
-  import cloudformation.CloudformationPlugin.autoImport._
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   def updateTimeToLive(client: AmazonDynamoDB, settings: AwscfSettings, ttl: TTLSetting): Unit
   
@@ -27,7 +27,9 @@ trait UpdateStack {
                      log: Logger) = Try {
     import scala.collection.JavaConverters._
 
-    val u = url(settings.bucketName, settings.baseDir, stack.template.value)
+    val bucketName = settings.bucketName.get
+    val baseDir = settings.baseDir.get
+    val u = url(bucketName, baseDir, stack.template.value)
     val params = stack.params.values.map {
       case (key, value) ⇒
         val p: Parameter = new Parameter().withParameterKey(key).withParameterValue(value)

@@ -1,4 +1,4 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.lambda
 
 import com.amazonaws.services.lambda.AWSLambda
 import sbt._

@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.s3
 
-import cloudformation.AwscfSettings
+import jp.pigumer.sbt.cloud.aws.cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{CreateStackRequest, DescribeStacksRequest, Parameter, Stack}
 import jp.pigumer.sbt.cloud.aws.cloudformation.CloudFormationWaiter
@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
 
 trait CreateBucket {
 
-  import cloudformation.CloudformationPlugin.autoImport._
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   def describeStacks(client: AmazonCloudFormation,
                      request: DescribeStacksRequest): Stream[Stack]
@@ -63,6 +63,7 @@ trait CreateBucket {
     val log = streams.value.log
     val settings = awscfSettings.value
     val client = awscf.value
+    val bucketName = settings.bucketName.get
     spaceDelimited("<stackName> <bucketName>").parsed match {
       case Seq(stackName, bucketName) ⇒
         createStack(client, settings, stackName, bucketName, log) match {
@@ -72,7 +73,7 @@ trait CreateBucket {
             sys.error(t.getMessage)
         }
       case Seq(stackName) ⇒
-        createStack(client, settings, stackName, settings.bucketName, log) match {
+        createStack(client, settings, stackName, bucketName, log) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒
             log.trace(t)

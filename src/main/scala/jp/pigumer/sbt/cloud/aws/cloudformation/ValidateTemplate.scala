@@ -2,7 +2,6 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import java.io.File
 
-import cloudformation.AwscfSettings
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.ValidateTemplateRequest
 import sbt.Def.spaceDelimited
@@ -14,14 +13,14 @@ import scala.util.{Failure, Success, Try}
 
 trait ValidateTemplate {
 
-  import cloudformation.CloudformationPlugin.autoImport._
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   private def validateTemplate(client: AmazonCloudFormation,
                                settings: AwscfSettings,
                                templateName: String,
                                log: Logger) = Try {
 
-    val path = new File(settings.templates, templateName)
+    val path = new File(settings.templates.get, templateName)
     val templateBody = Source.fromFile(path).mkString
 
     val request = new ValidateTemplateRequest().

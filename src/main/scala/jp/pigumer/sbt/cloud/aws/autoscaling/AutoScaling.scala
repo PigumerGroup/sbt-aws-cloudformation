@@ -1,6 +1,6 @@
 package jp.pigumer.sbt.cloud.aws.autoscaling
 
-import cloudformation.AwscfSettings
+import jp.pigumer.sbt.cloud.aws.cloudformation.AwscfSettings
 import com.amazonaws.services.autoscaling.AmazonAutoScalingClientBuilder
 
 object AutoScaling {

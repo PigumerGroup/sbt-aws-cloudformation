@@ -1,10 +1,11 @@
-package cloudformation
+package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.StackSummary
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
+import jp.pigumer.sbt.cloud.aws.s3.Awss3PutObjectRequests
 import sbt._
 
 trait CloudformationKeys {

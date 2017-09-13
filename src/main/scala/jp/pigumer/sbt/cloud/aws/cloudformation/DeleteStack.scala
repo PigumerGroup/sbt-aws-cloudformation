@@ -1,6 +1,5 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import cloudformation.{AwscfSettings, CloudformationStack}
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model.{DeleteStackRequest, DescribeStacksRequest}
 import sbt.Def.spaceDelimited
@@ -11,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 
 trait DeleteStack {
 
-  import cloudformation.CloudformationPlugin.autoImport._
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   private def delete(client: AmazonCloudFormation,
                      settings: AwscfSettings,
