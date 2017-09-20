@@ -52,6 +52,7 @@ Validate a AWS CloudFormation template.
 ex build.sbt::
 
   import jp.pigumer.sbt.cloud.aws.cloudformation._
+  import jp.pigumer.sbt.cloud.aws.dynamodb._
 
   lazy val root = (project in file(".")).
     enablePlugins(CloudformationPlugin).
@@ -61,8 +62,8 @@ ex build.sbt::
       awscfSettings := AwscfSettings(
         projectName = "example",
         region = <YOUR_REGION_NAME>,
-        bucketName = <YOUR_BUCKET_NAME>,
-        templates = file(<YOUR_TEMPLATES>),
+        bucketName = Option(<YOUR_BUCKET_NAME>),
+        templates = Option(file(<YOUR_TEMPLATES>)),
         roleARN = None
       ),
       awscfStacks := Stacks(
@@ -72,7 +73,7 @@ ex build.sbt::
           parameters = Map("<KEY>" → "<VALUE>"),
           capabilities = Seq("CAPABILITY_NAMED_IAM")),
           notificationARNs = Seq("<NOTIFICATION_ARN>"),
-          ttl = Seq(AwscfTTLSetting(
+          ttl = Seq(TTLSetting(
             tableName = "<DYNAMODB TABLE NAME>",
             attributeName = "<TTL ATTRIBUTE NAME>",
             enabled = <TTL ENABLED>)
