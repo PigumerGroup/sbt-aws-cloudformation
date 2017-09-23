@@ -3,7 +3,7 @@ import sbt._
 
 object Dependencies {
 
-  val AwsSdkVersion = "1.11.188"
+  val AwsSdkVersion = "1.11.201"
 
   val AwsCloudformationDeps = Seq(
     libraryDependencies ++= Seq(
@@ -15,6 +15,8 @@ object Dependencies {
       "com.amazonaws" % "aws-java-sdk-dynamodb" % AwsSdkVersion,
 
       "com.amazonaws" % "aws-java-sdk-ecr" % AwsSdkVersion,
+
+      "com.amazonaws" % "aws-java-sdk-greengrass" % AwsSdkVersion,
 
       "com.amazonaws" % "aws-java-sdk-lambda" % AwsSdkVersion,
       "com.amazonaws" % "aws-java-sdk-api-gateway" % AwsSdkVersion,
