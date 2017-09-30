@@ -16,8 +16,6 @@ object Dependencies {
 
       "com.amazonaws" % "aws-java-sdk-ecr" % AwsSdkVersion,
 
-      "com.amazonaws" % "aws-java-sdk-greengrass" % AwsSdkVersion,
-
       "com.amazonaws" % "aws-java-sdk-lambda" % AwsSdkVersion,
       "com.amazonaws" % "aws-java-sdk-api-gateway" % AwsSdkVersion,
 
