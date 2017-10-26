@@ -44,7 +44,7 @@ trait UploadTemplates {
                                              log: Logger): Seq[String] = {
     files match {
       case head +: tails ⇒ {
-        val res = uploads ++ put(dir, head, uploads)
+        val res = put(dir, head, uploads)
         putFiles(dir, tails, res)
       }
       case Nil ⇒ uploads
