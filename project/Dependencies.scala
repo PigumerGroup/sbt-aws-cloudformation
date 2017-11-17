@@ -12,8 +12,6 @@ object Dependencies {
 
       "com.amazonaws" % "aws-java-sdk-s3" % AwsSdkVersion,
 
-      "com.amazonaws" % "aws-java-sdk-dynamodb" % AwsSdkVersion,
-
       "com.amazonaws" % "aws-java-sdk-ecr" % AwsSdkVersion,
 
       "com.amazonaws" % "aws-java-sdk-lambda" % AwsSdkVersion,

@@ -2,8 +2,6 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model._
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import jp.pigumer.sbt.cloud.aws.dynamodb.TTLSetting
 import sbt.Def.spaceDelimited
 import sbt.Keys.streams
 import sbt.{Def, Logger}
@@ -14,8 +12,6 @@ trait UpdateStack {
 
   import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
-  def updateTimeToLive(client: AmazonDynamoDB, settings: AwscfSettings, ttl: TTLSetting): Unit
-  
   protected def url(bucketName: String, dir: String, fileName: String): String
 
   def describeStacks(client: AmazonCloudFormation,
@@ -63,13 +59,11 @@ trait UpdateStack {
     val log = streams.value.log
     val settings = awscfSettings.value
     val client = awscf.value
-    val dynamoDB = awsdynamodb.value
     spaceDelimited("<shortName>").parsed match {
       case Seq(shortName) ⇒
         (for {
           stack ← Try(awscfStacks.value.values.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
           _ ← update(client, settings, stack(), log)
-          _ ← Try(stack().ttl.values.foreach(t ⇒ updateTimeToLive(dynamoDB, settings, t)))
         } yield ()) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒

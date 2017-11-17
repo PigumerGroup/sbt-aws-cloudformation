@@ -15,8 +15,6 @@
 
 > awscfDeleteStack test2
 
-> awscfDeleteStack dynamodb
-
 -> awscfCreateStack fail
 
 > awscfCreateStack test
@@ -36,9 +34,5 @@
 > awscfUpdateStack test2u
 
 > awscfDeleteStack test2
-
-> awscfCreateStack dynamodb
-
-> awscfDeleteStack dynamodb
 
 > cfListExports
