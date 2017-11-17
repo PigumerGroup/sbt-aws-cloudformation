@@ -37,11 +37,6 @@ object CloudformationPlugin extends AutoPlugin {
       amazonS3(awscfSettings.value)
     },
 
-    awsdynamodb := {
-      import CloudformationTasks._
-      dynamoDB(awscfSettings.value)
-    },
-
     awscfGetCallerIdentityRequest :=
       awscfGetCallerIdentityRequest.?.value.getOrElse(new GetCallerIdentityRequest()),
     awscfAccountId := {

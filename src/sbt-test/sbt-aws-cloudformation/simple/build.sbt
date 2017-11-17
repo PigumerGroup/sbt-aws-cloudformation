@@ -1,5 +1,4 @@
 import jp.pigumer.sbt.cloud.aws.cloudformation._
-import jp.pigumer.sbt.cloud.aws.dynamodb._
 
 val role = sys.env.get("ROLE_ARN")
 val BucketName = sys.env.get("BUCKET_NAME")
@@ -47,13 +46,6 @@ lazy val root = (project in file(".")).
       Alias("fail2") → CloudformationStack(
         stackName = "test2",
         template = "test2.yaml"
-      ),
-      Alias("dynamodb") → CloudformationStack(
-        stackName = "dynamodb",
-        template = "dynamodb.yaml",
-        ttl = Seq(TTLSetting(tableName = "test",
-          attributeName = "expiration",
-          enabled = true))
       )
     )
   ).

@@ -1,11 +1,8 @@
 package jp.pigumer.sbt.cloud.aws.cloudformation
 
-import jp.pigumer.sbt.cloud.aws.dynamodb.{TTLSetting, TTLSettings}
-
 abstract class CloudformationStack(val stackName: StackName,
                           val template: Template,
-                          val capabilities: Capabilities = Capabilities.empty,
-                          val ttl: TTLSettings = TTLSettings.empty) {
+                          val capabilities: Capabilities = Capabilities.empty) {
   def notifications: NotificationARNs
   def params: Parameters
 }
@@ -16,12 +13,10 @@ object CloudformationStack {
             template: String,
             notificationARNs: Seq[String] = Seq.empty,
             capabilities: Seq[String] = Seq.empty,
-            parameters: Map[String, String] = Map.empty,
-            ttl: Seq[TTLSetting] = Seq.empty): CloudformationStack =
+            parameters: Map[String, String] = Map.empty): CloudformationStack =
     new CloudformationStack(stackName = StackName(stackName),
       template = Template(template),
-      capabilities = new Capabilities(capabilities.map(Capability)),
-      ttl = TTLSettings(ttl)
+      capabilities = new Capabilities(capabilities.map(Capability))
     ) {
       override def notifications: NotificationARNs = NotificationARNs(notificationARNs)
       override def params: Parameters = Parameters(parameters)
