@@ -10,7 +10,7 @@ Installation
 
 project/plugins.sbt::
 
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.19")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.20")
 
 
 your build.sbt::
@@ -52,7 +52,6 @@ Validate a AWS CloudFormation template.
 ex build.sbt::
 
   import jp.pigumer.sbt.cloud.aws.cloudformation._
-  import jp.pigumer.sbt.cloud.aws.dynamodb._
 
   lazy val root = (project in file(".")).
     enablePlugins(CloudformationPlugin).
@@ -72,12 +71,7 @@ ex build.sbt::
           template = "<YOUR_TEMPLATE>",
           parameters = Map("<KEY>" → "<VALUE>"),
           capabilities = Seq("CAPABILITY_NAMED_IAM")),
-          notificationARNs = Seq("<NOTIFICATION_ARN>"),
-          ttl = Seq(TTLSetting(
-            tableName = "<DYNAMODB TABLE NAME>",
-            attributeName = "<TTL ATTRIBUTE NAME>",
-            enabled = <TTL ENABLED>)
-          )
+          notificationARNs = Seq("<NOTIFICATION_ARN>")
         )
       )
 
