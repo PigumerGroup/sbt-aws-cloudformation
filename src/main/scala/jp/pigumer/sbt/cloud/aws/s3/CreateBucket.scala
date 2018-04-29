@@ -63,7 +63,6 @@ trait CreateBucket {
     val log = streams.value.log
     val settings = awscfSettings.value
     val client = awscf.value
-    val bucketName = settings.bucketName.get
     spaceDelimited("<stackName> <bucketName>").parsed match {
       case Seq(stackName, bucketName) ⇒
         createStack(client, settings, stackName, bucketName, log) match {
@@ -73,6 +72,7 @@ trait CreateBucket {
             sys.error(t.getMessage)
         }
       case Seq(stackName) ⇒
+        val bucketName = settings.bucketName.get
         createStack(client, settings, stackName, bucketName, log) match {
           case Success(_) ⇒ ()
           case Failure(t) ⇒
