@@ -3,7 +3,7 @@ import sbt._
 
 object Dependencies {
 
-  val AwsSdkVersion = "1.11.201"
+  val AwsSdkVersion = "1.11.343"
 
   val AwsCloudformationDeps = Seq(
     libraryDependencies ++= Seq(
@@ -22,9 +22,7 @@ object Dependencies {
       "com.amazonaws" % "aws-java-sdk-autoscaling" % AwsSdkVersion,
       "com.amazonaws" % "aws-java-sdk-applicationautoscaling" % AwsSdkVersion,
 
-      "org.specs2" %% "specs2-core" % "3.8.6" % Test,
-      "org.specs2" %% "specs2-mock" % "3.8.6" % Test,
-      "org.specs2" %% "specs2-junit" % "3.8.6" % Test
+      "org.scalatest" %% "scalatest" % "3.0.5" % Test
     )
   )
 }
