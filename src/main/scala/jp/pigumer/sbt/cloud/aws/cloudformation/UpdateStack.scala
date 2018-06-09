@@ -20,7 +20,7 @@ trait UpdateStack {
   private def update(client: AmazonCloudFormation,
                      settings: AwscfSettings,
                      stack: CloudformationStack,
-                     log: Logger) = Try {
+                     log: Logger): Try[Stream[Stack]] = Try {
     import scala.collection.JavaConverters._
 
     val bucketName = settings.bucketName.get
@@ -40,18 +40,23 @@ trait UpdateStack {
       withNotificationARNs(stack.notifications.values.map(_.value).asJava)
 
     log.info(stack.stackName.value)
-    client.updateStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
 
-    val describeStacksRequest = new DescribeStacksRequest().withStackName(stack.stackName.value)
-    new CloudFormationWaiter(client, client.waiters.stackUpdateComplete).wait(describeStacksRequest)
-    val stacks = describeStacks(client, describeStacksRequest)
+    try {
+      client.updateStack(settings.roleARN.map(r ⇒ request.withRoleARN(r)).getOrElse(request))
 
-    stacks.foreach(s ⇒ log.info(s"${s.getStackName} ${s.getStackStatus}"))
+      val describeStacksRequest = new DescribeStacksRequest().withStackName(stack.stackName.value)
+      new CloudFormationWaiter(client, client.waiters.stackUpdateComplete).wait(describeStacksRequest)
+      val stacks = describeStacks(client, describeStacksRequest)
 
-    if (!stacks.forall(_.getStackStatus == StackStatus.UPDATE_COMPLETE.toString)) {
-      throw UpdateStackException()
-    } else {
-      stacks
+      stacks.foreach(s ⇒ log.info(s"${s.getStackName} ${s.getStackStatus}"))
+      if (!stacks.forall(_.getStackStatus == StackStatus.UPDATE_COMPLETE.toString)) {
+        throw UpdateStackException()
+      } else {
+        stacks
+      }
+    } catch {
+      case e: AmazonCloudFormationException if e.getMessage.contains("No updates are to be performed.") ⇒
+        Stream.empty
     }
   }
 
