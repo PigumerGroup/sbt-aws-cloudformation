@@ -20,14 +20,17 @@ object CloudformationTasks
   with CreateBucket
   with Sts {
 
+  private var exports: Map[String, String] = Map.empty
+
   def getValueTask = Def.inputTask {
     import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
     spaceDelimited("<key>").parsed match {
       case Seq(key) ⇒
-        awscfListExports.value.filter { export ⇒
-          export.name == key
-        }.map(_.value).head
+        exports.getOrElse(key, {
+          exports = awscfListExports.value.map(export ⇒ (export.name, export.value)).toMap
+          exports(key)
+        })
       case _ ⇒ sys.error("Usage: <key>")
     }
   }
