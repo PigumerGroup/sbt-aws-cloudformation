@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/PigumerGroup/sbt-aws-cloudformation.svg?branch=master
+    :target: https://travis-ci.org/PigumerGroup/sbt-aws-cloudformation
+
 sbt-aws-cloudformation
 ======================
 
