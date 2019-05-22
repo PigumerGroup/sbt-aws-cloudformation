@@ -1,28 +1,27 @@
-.. image:: https://travis-ci.org/PigumerGroup/sbt-aws-cloudformation.svg?branch=master
-    :target: https://travis-ci.org/PigumerGroup/sbt-aws-cloudformation
+[![Build Status](https://travis-ci.org/PigumerGroup/sbt-aws-cloudformation.svg?branch=master)](https://travis-ci.org/PigumerGroup/sbt-aws-cloudformation)
 
-sbt-aws-cloudformation
+[sbt-aws-cloudformation](https://repo1.maven.org/maven2/com/pigumer/sbt/cloud/)
 ======================
 
 A sbt plugin for AWS CloudFormation.
 
 * sbt 0.13.16+ or sbt 1.0.0+
 
-Installation
-------------
+# Installation
 
-project/plugins.sbt::
+project/plugins.sbt
 
+```sbt
   addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.24")
+```
 
+your build.sbt
 
-your build.sbt::
-
+```sbt
   enablePlugins(CloudformationPlugin)
+```
 
-
-Usage
------
+# Usage
 
 ``awscfCreateBucket <stackName> <bucketName>``
 
@@ -52,15 +51,16 @@ Validate a AWS CloudFormation template.
 
 ``awscfListExports``
 
-ex build.sbt::
+ex build.sbt
 
+```sbt
   import jp.pigumer.sbt.cloud.aws.cloudformation._
 
   lazy val root = (project in file(".")).
     enablePlugins(CloudformationPlugin).
     settings(
       version := "0.1",
-      scalaVersion := "2.12.3",
+      scalaVersion := "2.12.8",
       awscfSettings := AwscfSettings(
         projectName = "example",
         region = <YOUR_REGION_NAME>,
@@ -77,15 +77,15 @@ ex build.sbt::
           notificationARNs = Seq("<NOTIFICATION_ARN>")
         )
       )
+```
 
-Snippets
---------
+# Snippets
 
-AWS Lambda
-^^^^^^^^^^
+## AWS Lambda
 
-updateFunctionCode::
+updateFunctionCode
 
+```sbt
     val lambdaUpdateFunctionCode = taskKey[Unit]("update lambda function code")
 
     lambdaUpdateFunctionCode := {
@@ -95,16 +95,19 @@ updateFunctionCode::
         withS3Key((assemblyOutputPath in assembly).value.getName)
       awslambda.value.updateFunctionCode(updateFunctionCodeRequest)
     }
+```
 
-ECR
-^^^^
+## ECR
 
-login::
+login
 
+```sbt
     awsecr::awsecrLogin
+```
 
-tagging and push::
+tagging and push
 
+```sbt
     val ecrPush = taskKey[Unit]("push")
 
     ecrPush := {
@@ -122,12 +125,13 @@ tagging and push::
       AwsecrCommands.push(docker, target)
       ()
     }
+```
 
-ECS
-^^^^
+## ECS
 
-updateService::
+updateService
 
+```sbt
     val ecsUpdateService = taskKey[Unit]("update service")
 
     ecsUpdateService := {
@@ -155,3 +159,5 @@ updateService::
 
       ecs.updateService(updateServiceRequest)
     }
+```
+
