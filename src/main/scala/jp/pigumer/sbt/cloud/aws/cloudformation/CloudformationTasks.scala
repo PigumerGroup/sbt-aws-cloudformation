@@ -10,9 +10,8 @@ object CloudformationTasks
   with UploadTemplates
 
   with CloudFormationProvider
-  with CreateStack
+  with CreateOrUpdateStack
   with DeleteStack
-  with UpdateStack
   with ValidateTemplate
   with ListExports
   with ListStacks

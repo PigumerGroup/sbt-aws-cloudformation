@@ -2,22 +2,19 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation
 import com.amazonaws.services.cloudformation.model._
-import sbt.Def.spaceDelimited
-import sbt.Keys.streams
-import sbt.{Def, Logger}
+import sbt.Logger
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 trait UpdateStack {
-
-  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   protected def url(bucketName: String, dir: String, fileName: String): String
 
   def describeStacks(client: AmazonCloudFormation,
                      request: DescribeStacksRequest): Stream[Stack]
 
-  private def update(client: AmazonCloudFormation,
+  private [cloudformation]
+  def update(client: AmazonCloudFormation,
                      settings: AwscfSettings,
                      stack: CloudformationStack,
                      log: Logger): Try[Stream[Stack]] = Try {
@@ -60,22 +57,4 @@ trait UpdateStack {
     }
   }
 
-  def updateStackTask = Def.inputTask {
-    val log = streams.value.log
-    val settings = awscfSettings.value
-    val client = awscf.value
-    spaceDelimited("<shortName>").parsed match {
-      case Seq(shortName) ⇒
-        (for {
-          stack ← Try(awscfStacks.value.values.getOrElse(shortName, sys.error(s"$shortName of the stack is not defined")))
-          _ ← update(client, settings, stack(), log)
-        } yield ()) match {
-          case Success(_) ⇒ ()
-          case Failure(t) ⇒
-            log.trace(t)
-            sys.error(t.getMessage)
-        }
-      case _ ⇒ sys.error("Usage: <shortName>")
-    }
-  }
 }

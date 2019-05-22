@@ -2,6 +2,7 @@ package jp.pigumer.sbt.cloud.aws.cloudformation
 
 abstract class CloudformationStack(val stackName: StackName,
                           val template: Template,
+                          val ifExistsUpdate: Boolean,
                           val capabilities: Capabilities = Capabilities.empty) {
   def notifications: NotificationARNs
   def params: Parameters
@@ -11,11 +12,13 @@ object CloudformationStack {
 
   def apply(stackName: String,
             template: String,
+            ifExistsUpdate: Boolean = true,
             notificationARNs: Seq[String] = Seq.empty,
             capabilities: Seq[String] = Seq.empty,
             parameters: Map[String, String] = Map.empty): CloudformationStack =
     new CloudformationStack(stackName = StackName(stackName),
       template = Template(template),
+      ifExistsUpdate = ifExistsUpdate,
       capabilities = new Capabilities(capabilities.map(Capability))
     ) {
       override def notifications: NotificationARNs = NotificationARNs(notificationARNs)
