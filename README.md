@@ -12,7 +12,7 @@ A sbt plugin for AWS CloudFormation.
 project/plugins.sbt
 
 ```sbt
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.24")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.25")
 ```
 
 your build.sbt
