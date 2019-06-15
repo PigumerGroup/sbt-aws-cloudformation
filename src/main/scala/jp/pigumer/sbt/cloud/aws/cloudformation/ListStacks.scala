@@ -5,27 +5,6 @@ import com.amazonaws.services.cloudformation.model.{ListStacksRequest, StackStat
 import sbt.Def
 
 import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
-
-trait ListStacks {
-
-  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
-
-  private def listStacks(client: AmazonCloudFormation, settings: AwscfSettings): Try[Stream[StackSummary]] = Try {
-    ListStacks.listStacks(client)
-  }
-
-  def listStacksTask = Def.task {
-    val settings = awscfSettings.value
-    val client = awscf.value
-    listStacks(client, settings) match {
-      case Success(r) ⇒ r
-      case Failure(t) ⇒ {
-        sys.error(t.toString)
-      }
-    }
-  }
-}
 
 object ListStacks {
 
@@ -34,6 +13,7 @@ object ListStacks {
   @tailrec
   private def stacks(client: AmazonCloudFormation,
                      request: ListStacksRequest,
+                     maybeInterval: Option[Int],
                      stackList: Stream[StackSummary]): Stream[StackSummary] = {
     val result = client.listStacks(request)
     val list = stackList ++ result.getStackSummaries.asScala.filterNot { r ⇒
@@ -43,14 +23,28 @@ object ListStacks {
       case None ⇒ list
       case Some(n) ⇒ {
         request.withNextToken(n)
-        stacks(client, request, list)
+        maybeInterval.foreach(Thread.sleep(_))
+        stacks(client, request, maybeInterval, list)
       }
     }
   }
 
-  def listStacks(client: AmazonCloudFormation): Stream[StackSummary] = {
+  def listStacks(client: AmazonCloudFormation, maybeInterval: Option[Int]): Stream[StackSummary] = {
     val request = new ListStacksRequest()
-    stacks(client, request, Stream.empty)
+    stacks(client, request, maybeInterval, Stream.empty)
   }
 
 }
+
+trait ListStacks {
+
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
+
+  def listStacksTask = Def.task {
+    val settings = awscfSettings.value
+    val client = awscf.value
+    val maybeInterval = awscfInterval.?.value
+    ListStacks.listStacks(client, maybeInterval)
+  }
+}
+

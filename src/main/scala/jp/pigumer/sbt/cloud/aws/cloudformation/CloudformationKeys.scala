@@ -13,6 +13,10 @@ trait CloudformationKeys {
   lazy val awss3 = taskKey[AmazonS3]("AWS S3 tasks")
 
   lazy val awscfSettings = settingKey[AwscfSettings]("AWS CloudFormation settings")
+  lazy val awscfInterval = settingKey[Int]("interval milliseconds")
+
+  lazy val awscfRetryInterval = settingKey[Int]("retry interval milliseconds")
+  lazy val awscfRetryCount = settingKey[Int]("retry count")
 
   lazy val awscfGetCallerIdentityRequest = taskKey[GetCallerIdentityRequest]("GetCallerIdentityRequest")
   lazy val awscfAccountId = taskKey[String]("Get account id")

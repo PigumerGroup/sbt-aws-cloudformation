@@ -5,30 +5,6 @@ import com.amazonaws.services.cloudformation.model.{ListExportsRequest, StackSum
 import sbt.Def
 
 import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
-
-trait ListExports {
-
-  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
-
-  private def listExports(client: AmazonCloudFormation,
-                          settings: AwscfSettings,
-                          stacks: Stream[StackSummary]): Try[Stream[AwscfExport]] = Try {
-    ListExports.listExports(client, stacks)
-  }
-
-  def listExportsTask = Def.task {
-    val settings = awscfSettings.value
-    val client = awscf.value
-    val stacks = awscfListStacks.value
-    listExports(client, settings, stacks) match {
-      case Success(r) ⇒ r
-      case Failure(t) ⇒ {
-        sys.error(t.toString)
-      }
-    }
-  }
-}
 
 object ListExports {
 
@@ -38,6 +14,7 @@ object ListExports {
   private def exports(client: AmazonCloudFormation,
                       request: ListExportsRequest,
                       stacks: Map[String, StackSummary],
+                      maybeInterval: Option[Int],
                       exportList: Stream[AwscfExport]): Stream[AwscfExport] = {
     val result = client.listExports(request)
     val list = exportList ++ result.getExports.asScala.map { e ⇒
@@ -50,17 +27,30 @@ object ListExports {
     Option(result.getNextToken) match {
       case Some(n) ⇒ {
         request.withNextToken(n)
-        exports(client, request, stacks, list)
+        maybeInterval.foreach(Thread.sleep(_))
+        exports(client, request, stacks, maybeInterval, list)
       }
       case None ⇒ list
     }
   }
 
-  def listExports(client: AmazonCloudFormation, stacks: Stream[StackSummary]): Stream[AwscfExport] = {
+  def listExports(client: AmazonCloudFormation, maybeInterval: Option[Int], stacks: Stream[StackSummary]): Stream[AwscfExport] = {
     val request = new ListExportsRequest()
 
     val map = stacks.map(s ⇒ (s.getStackId, s)).toMap
-    exports(client, request, map, Stream.empty)
+    exports(client, request, map, maybeInterval, Stream.empty)
   }
 
 }
+
+trait ListExports {
+
+  import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
+
+  def listExportsTask = Def.task {
+    val client = awscf.value
+    val maybeInterval = awscfInterval.?.value
+    ListExports.listExports(client, maybeInterval, ListStacks.listStacks(client, maybeInterval))
+  }
+}
+
