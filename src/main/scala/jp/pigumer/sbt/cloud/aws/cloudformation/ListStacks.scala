@@ -11,6 +11,20 @@ object ListStacks {
   import scala.collection.JavaConverters._
 
   @tailrec
+  private def retry(count: Int, maybeInterval: Option[Int])(stacks: ⇒ Stream[StackSummary]): Stream[StackSummary] =
+    try {
+      stacks
+    } catch {
+      case e: Throwable ⇒
+        if (count == 0) {
+          throw e
+        } else {
+          maybeInterval.foreach(Thread.sleep(_))
+          retry(count - 1, maybeInterval)(stacks)
+        }
+    }
+
+  @tailrec
   private def stacks(client: AmazonCloudFormation,
                      request: ListStacksRequest,
                      maybeInterval: Option[Int],
@@ -29,9 +43,14 @@ object ListStacks {
     }
   }
 
-  def listStacks(client: AmazonCloudFormation, maybeInterval: Option[Int]): Stream[StackSummary] = {
+  def listStacks(client: AmazonCloudFormation,
+                 retryCount: Int,
+                 maybeRetryInterval: Option[Int],
+                 maybeInterval: Option[Int]): Stream[StackSummary] = {
     val request = new ListStacksRequest()
-    stacks(client, request, maybeInterval, Stream.empty)
+    retry(retryCount, maybeRetryInterval) {
+      stacks(client, request, maybeInterval, Stream.empty)
+    }
   }
 
 }
@@ -41,10 +60,11 @@ trait ListStacks {
   import jp.pigumer.sbt.cloud.aws.cloudformation.CloudformationPlugin.autoImport._
 
   def listStacksTask = Def.task {
-    val settings = awscfSettings.value
     val client = awscf.value
+    val retryCount = awscfRetryCount.?.value.getOrElse(0)
+    val maybeRetryInterval = awscfRetryInterval.?.value
     val maybeInterval = awscfInterval.?.value
-    ListStacks.listStacks(client, maybeInterval)
+    ListStacks.listStacks(client, retryCount, maybeRetryInterval, maybeInterval)
   }
 }
 

@@ -12,7 +12,7 @@ A sbt plugin for AWS CloudFormation.
 project/plugins.sbt
 
 ```sbt
-  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.26")
+  addSbtPlugin("com.pigumer.sbt.cloud" % "sbt-aws-cloudformation" % "5.0.27-SNAPSHOT")
 ```
 
 your build.sbt
@@ -61,6 +61,9 @@ ex build.sbt
     settings(
       version := "0.1",
       scalaVersion := "2.12.8",
+      awscfRetryCount := 1,
+      awscfRetryInterval := 300000,
+      awscfInterval := 1000,
       awscfSettings := AwscfSettings(
         projectName = "example",
         region = <YOUR_REGION_NAME>,
@@ -78,6 +81,12 @@ ex build.sbt
         )
       )
 ```
+
+# Settings
+
+## awscfRetryCount, awscfRetryInterval
+
+Specifies the number of retries for the `awscfListStacks` and `awscfListExports`, and the retry interval in milliseconds.
 
 # Snippets
 

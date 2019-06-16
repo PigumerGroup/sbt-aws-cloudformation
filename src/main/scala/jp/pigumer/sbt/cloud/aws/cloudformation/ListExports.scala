@@ -11,6 +11,20 @@ object ListExports {
   import scala.collection.JavaConverters._
 
   @tailrec
+  private def retry(count: Int, maybeInterval: Option[Int])(exports: ⇒ Stream[AwscfExport]): Stream[AwscfExport] =
+    try {
+      exports
+    } catch {
+      case e: Throwable ⇒
+        if (count == 0) {
+          throw e
+        } else {
+          maybeInterval.foreach(Thread.sleep(_))
+          retry(count - 1, maybeInterval)(exports)
+        }
+    }
+
+  @tailrec
   private def exports(client: AmazonCloudFormation,
                       request: ListExportsRequest,
                       stacks: Map[String, StackSummary],
@@ -34,11 +48,16 @@ object ListExports {
     }
   }
 
-  def listExports(client: AmazonCloudFormation, maybeInterval: Option[Int], stacks: Stream[StackSummary]): Stream[AwscfExport] = {
+  def listExports(client: AmazonCloudFormation,
+                  retryCount: Int,
+                  maybeRetryInterval: Option[Int],
+                  maybeInterval: Option[Int], stacks: Stream[StackSummary]): Stream[AwscfExport] = {
     val request = new ListExportsRequest()
 
     val map = stacks.map(s ⇒ (s.getStackId, s)).toMap
-    exports(client, request, map, maybeInterval, Stream.empty)
+    retry(retryCount, maybeRetryInterval) {
+      exports(client, request, map, maybeInterval, Stream.empty)
+    }
   }
 
 }
@@ -49,8 +68,14 @@ trait ListExports {
 
   def listExportsTask = Def.task {
     val client = awscf.value
+    val retryCount = awscfRetryCount.?.value.getOrElse(0)
+    val maybeRetryInterval = awscfRetryInterval.?.value
     val maybeInterval = awscfInterval.?.value
-    ListExports.listExports(client, maybeInterval, ListStacks.listStacks(client, maybeInterval))
+    ListExports.listExports(client,
+      retryCount,
+      maybeRetryInterval,
+      maybeInterval,
+      ListStacks.listStacks(client, retryCount, maybeRetryInterval, maybeInterval))
   }
 }
 

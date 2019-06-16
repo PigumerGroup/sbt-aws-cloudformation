@@ -27,11 +27,20 @@ object CloudformationTasks
 
     val log = streams.value.log
     val cf = awscf.value
+    val retryCount = awscfRetryCount.?.value.getOrElse(0)
+    val maybeRetryInterval = awscfRetryInterval.?.value
     val maybeInterval = awscfInterval.?.value
     spaceDelimited("<key>").parsed match {
       case Seq(key) ⇒
         exports.getOrElse(key, {
-          exports = ListExports.listExports(cf, maybeInterval, ListStacks.listStacks(cf, maybeInterval)).map(export ⇒ (export.name, export.value)).toMap
+          exports = ListExports.listExports(cf,
+            retryCount,
+            maybeRetryInterval,
+            maybeInterval,
+            ListStacks.listStacks(cf,
+              retryCount,
+              maybeRetryInterval,
+              maybeInterval)).map(export ⇒ (export.name, export.value)).toMap
           exports(key)
         })
       case _ ⇒ sys.error("Usage: <key>")
