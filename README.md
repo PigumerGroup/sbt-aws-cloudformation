@@ -5,7 +5,7 @@
 
 A sbt plugin for AWS CloudFormation.
 
-* sbt 0.13.16+ or sbt 1.0.0+
+* sbt 1.0.0+
 
 # Installation
 
